@@ -116,8 +116,8 @@
                                 บันทึก
                             </button>
                             <a href="{{ route('student.revision.index') }}"
-                                class="inline-flex items-center px-6 py-2 bg-gray-300 text-gray-700 font-medium
-                                      rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                                class="inline-flex items-center px-6 py-2 bg-red-300 text-red-700 font-medium
+                                      rounded-lg hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-400">
                                 ยกเลิก
                             </a>
                         </div>

@@ -131,7 +131,7 @@
                                 บันทึก
                             </button>
                             <a href="{{ route('student.upload.index') }}"
-                                class="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-2 rounded-lg shadow transition">
+                                class="bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-2 rounded-lg shadow transition">
                                 ยกเลิก
                             </a>
                         </div>
