@@ -25,7 +25,8 @@
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-2">
                     {{-- LEFT: แบนเนอร์/รูป --}}
-                    <a href="{{ route('welcome') }}" class="block group" aria-label="ไปหน้ารวมโครงงาน" title="ไปหน้ารวมโครงงาน">
+                    <a href="{{ route('welcome') }}" class="block group" aria-label="ไปหน้ารวมโครงงาน"
+                        title="ไปหน้ารวมโครงงาน">
                         <div class="relative">
                             <img src="{{ asset('images/CSIT.jpg') }}" alt="Research Exam"
                                 class="w-full h-full object-cover aspect-[4/3] lg:aspect-auto group-hover:opacity-90 transition" />
@@ -55,31 +56,16 @@
                                     <label for="password"
                                         class="block text-sm font-medium text-gray-700">รหัสผ่าน</label>
                                     @if (Route::has('password.request'))
-                                    <a href="{{ route('password.request') }}"
-                                        class="text-xs font-medium text-red-600 hover:text-red-700">ลืมรหัสผ่าน?</a>
+                                        <a href="{{ route('password.request') }}"
+                                            class="text-xs font-medium text-red-600 hover:text-red-700">ลืมรหัสผ่าน?</a>
                                     @endif
                                 </div>
 
                                 <div class="mt-1 relative">
                                     <input id="password" name="password" type="password"
                                         autocomplete="current-password"
-                                        class="block w-full rounded-lg border-gray-300 pr-10 focus:border-red-500 focus:ring-red-500"
+                                        class="block w-full rounded-lg border-gray-300 focus:border-red-500 focus:ring-red-500"
                                         placeholder="รหัสผ่าน" required>
-                                    <button type="button" id="togglePwdBtn"
-                                        class="absolute inset-y-0 right-0 px-3 grid place-items-center text-gray-500 hover:text-gray-700"
-                                        aria-label="แสดงรหัสผ่าน">
-                                        <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                            class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.8">
-                                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z" />
-                                            <circle cx="12" cy="12" r="3" />
-                                        </svg>
-                                        <svg id="eyeOff" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                            class="w-5 h-5 hidden" fill="none" stroke="currentColor"
-                                            stroke-width="1.8">
-                                            <path
-                                                d="M3 3l18 18M10.6 10.6a3 3 0 1 0 4.8 4.8M9.9 4.2A10.6 10.6 0 0 1 12 4c7 0 11 8 11 8a17.7 17.7 0 0 1-5.1 5.7M6.1 6.1C3.5 7.8 1.7 10 1 12c0 0 4 8 11 8 1.6 0 3.1-.3 4.4-.8" />
-                                        </svg>
-                                    </button>
                                 </div>
                                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
                             </div>
@@ -92,11 +78,11 @@
                         </form>
 
                         @if (session('swal'))
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                Swal.fire(@json(session('swal')));
-                            });
-                        </script>
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    Swal.fire(@json(session('swal')));
+                                });
+                            </script>
                         @endif
                     </div>
                 </div>
@@ -126,23 +112,14 @@
             const idInput = document.getElementById('id');
             const pwdInput = document.getElementById('password');
             const btn = document.getElementById('loginBtn');
-            const toggle = document.getElementById('togglePwdBtn');
-            const eyeOpen = document.getElementById('eyeOpen');
-            const eyeOff = document.getElementById('eyeOff');
 
             function updateBtn() {
                 btn.disabled = !(idInput.value.trim() && pwdInput.value.trim());
             }
+
             idInput.addEventListener('input', updateBtn);
             pwdInput.addEventListener('input', updateBtn);
             updateBtn();
-
-            toggle?.addEventListener('click', () => {
-                const show = pwdInput.type === 'password';
-                pwdInput.type = show ? 'text' : 'password';
-                eyeOpen.classList.toggle('hidden', show);
-                eyeOff.classList.toggle('hidden', !show);
-            });
         });
     </script>
 </body>
