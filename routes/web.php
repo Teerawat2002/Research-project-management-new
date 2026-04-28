@@ -58,7 +58,7 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['auth:students,advisors'])->group(function () {
     Route::prefix('/profile')->name('profile.')->group(function () {
-        Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+        Route::get('/', [ProfileController::class, 'edit'])->name('edit')->defaults('title', 'จัดการข้อมูลส่วนตัว');
         Route::patch('/', [ProfileController::class, 'update'])->name('update');
         Route::patch('/password', [ProfileController::class, 'updatePassword'])->name('update.password');
         Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
