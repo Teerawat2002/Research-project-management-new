@@ -1,86 +1,123 @@
-<nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-    <div class="px-3 py-3 lg:px-5 lg:pl-3">
+<nav
+    class="sticky top-0 z-20 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 dark:bg-gray-900/80 dark:border-gray-800 transition-colors duration-200">
+    <div class="px-4 py-3 lg:px-6">
         <div class="flex items-center justify-between">
-            <div class="flex items-center justify-start rtl:justify-end">
-                {{-- <button @click="open = !open"
-                    class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
-                    <span class="sr-only">Open sidebar</span>
-                    <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path clip-rule="evenodd" fill-rule="evenodd"
-                            d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z">
-                        </path>
-                    </svg>
-                </button> --}}
-                <a href="{{ route('welcome') }}" class="flex ms-2 md:me-24">
-                    {{-- <img src="https://flowbite.com/docs/images/logo.svg" class="h-8 me-3" alt="FlowBite Logo" /> --}}
-                    <span
-                        class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">Research
-                        Exam</span>
-                </a>
+
+            <div class="flex items-center justify-start">
+                <button @click="open = !open"
+                    class="sm:hidden inline-flex items-center p-2 text-gray-500 rounded-lg hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-200 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 mr-2 transition-colors">
+                    <i class="fa-solid fa-bars fa-lg"></i>
+                </button>
+
+                <div class="hidden sm:flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-2">
+                    <a href="{{ route('welcome') }}"
+                        class="hover:text-orange-500 dark:hover:text-orange-400 transition-colors">
+                        <i
+                            class="fa-solid fa-house text-gray-400 dark:text-gray-500 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"></i>
+                    </a>
+                    <span>/</span>
+                    <span class="font-medium text-gray-800 dark:text-gray-200">
+                        {{-- ดึงค่า title จาก Route ถ้าไม่มีให้ใช้คำว่า 'จัดการข้อมูล' แทน --}}
+                        {{ request()->route('title') ?? 'จัดการข้อมูล' }}
+                    </span>
+                </div>
             </div>
 
-            <!-- Hamburger Menu for Mobile -->
-            <button @click="open = !open"
-                class="sm:hidden inline-flex items-center p-2 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
-                <span class="sr-only">Open menu</span>
-                <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path clip-rule="evenodd" fill-rule="evenodd"
-                        d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z">
-                    </path>
-                </svg>
-            </button>
+            <div class="flex items-center space-x-4">
 
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <!-- Trigger -->
-                    <x-slot name="trigger">
-                        <button
-                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:text-white focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                        clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
+                <button id="theme-toggle" type="button"
+                    class="text-gray-400 hover:text-orange-500 dark:text-gray-400 dark:hover:text-orange-400 transition-colors focus:outline-none rounded-lg p-2.5">
+                    <i id="theme-toggle-dark-icon" class="fa-solid fa-moon fa-lg hidden"></i>
+                    <i id="theme-toggle-light-icon" class="fa-solid fa-sun fa-lg hidden"></i>
+                </button>
 
-                    <!-- Dropdown Content -->
-                    <x-slot name="content">
-                        <!-- Profile Link -->
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
+                <div class="hidden sm:flex sm:items-center">
+                    <x-dropdown align="right" width="48">
+                        <x-slot name="trigger">
+                            <button
+                                class="flex items-center text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white focus:outline-none transition-colors">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400 flex items-center justify-center font-bold mr-2">
+                                    @if (Auth::guard('students')->check())
+                                        {{ mb_substr(Auth::guard('students')->user()->name, 0, 1) }}
+                                    @elseif(Auth::guard('advisors')->check())
+                                        {{ mb_substr(Auth::guard('advisors')->user()->name, 0, 1) }}
+                                    @endif
+                                </div>
+                                <i class="fa-solid fa-chevron-down text-xs text-gray-400 dark:text-gray-500"></i>
+                            </button>
+                        </x-slot>
 
-                        <!-- Logout -->
-                        @if (Auth::guard('students')->check())
-                            <form method="POST" action="{{ route('studentLogout.logout') }}">
-                                @csrf
-                                <x-dropdown-link :href="route('studentLogout.logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                    {{ 'Log Out' }}
-                                </x-dropdown-link>
-                            </form>
-                        @endif
-                        @if (Auth::guard('advisors')->check())
-                            <form method="POST" action="{{ route('advisorLogout.logout') }}">
-                                @csrf
-                                <x-dropdown-link :href="route('advisorLogout.logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                    {{ 'Log Out' }}
-                                </x-dropdown-link>
-                            </form>
-                        @endif
-                    </x-slot>
-                </x-dropdown>
+                        <x-slot name="content">
+                            <x-dropdown-link :href="route('profile.edit')"
+                                class="dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white">
+                                <i class="fa-regular fa-user mr-2"></i>Profile
+                            </x-dropdown-link>
+
+                            <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+
+                            @if (Auth::guard('students')->check())
+                                <form method="POST" action="{{ route('studentLogout.logout') }}">
+                                    @csrf
+                                    <x-dropdown-link :href="route('studentLogout.logout')"
+                                        onclick="event.preventDefault(); this.closest('form').submit();"
+                                        class="text-red-600 dark:text-red-400 dark:hover:bg-gray-800">
+                                        <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>Log Out
+                                    </x-dropdown-link>
+                                </form>
+                            @endif
+                            @if (Auth::guard('advisors')->check())
+                                <form method="POST" action="{{ route('advisorLogout.logout') }}">
+                                    @csrf
+                                    <x-dropdown-link :href="route('advisorLogout.logout')"
+                                        onclick="event.preventDefault(); this.closest('form').submit();"
+                                        class="text-red-600 dark:text-red-400 dark:hover:bg-gray-800">
+                                        <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i>Log Out
+                                    </x-dropdown-link>
+                                </form>
+                            @endif
+                        </x-slot>
+                    </x-dropdown>
+                </div>
             </div>
         </div>
     </div>
 </nav>
+
+<script>
+    // ส่วน Script ทำงานได้สมบูรณ์แล้ว ไม่ต้องแก้ไขครับ
+    var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia(
+            '(prefers-color-scheme: dark)').matches)) {
+        themeToggleLightIcon.classList.remove('hidden');
+    } else {
+        themeToggleDarkIcon.classList.remove('hidden');
+    }
+
+    var themeToggleBtn = document.getElementById('theme-toggle');
+
+    themeToggleBtn.addEventListener('click', function() {
+        themeToggleDarkIcon.classList.toggle('hidden');
+        themeToggleLightIcon.classList.toggle('hidden');
+
+        if (localStorage.getItem('color-theme')) {
+            if (localStorage.getItem('color-theme') === 'light') {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+            }
+        } else {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+            }
+        }
+    });
+</script>

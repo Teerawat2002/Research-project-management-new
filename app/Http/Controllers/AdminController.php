@@ -67,7 +67,7 @@ class AdminController extends Controller
             ->when($typeFilter, function ($query, $typeFilter) {
                 return $query->where('a_type', $typeFilter);
             })
-            ->orderBy('id', 'asc')
+            ->orderBy('a_id', 'asc')
             ->paginate(10)
             ->appends([
                 'search' => $search,
@@ -112,6 +112,166 @@ class AdminController extends Controller
     }
 
     // นำเข้าข้อมูลอาจารย์ excel (JSON จาก SheetJS)
+    // public function importAdvisor(Request $request)
+    // {
+    //     try {
+    //         $rows = $request->input('advisors');
+    //         if (!$rows || !is_array($rows) || count($rows) === 0) {
+    //             return response()->json(['message' => 'ไม่มีข้อมูลนำเข้า'], 400);
+    //         }
+
+    //         // ถ้าไฟล์ของคุณหัวตารางอยู่ "แถว 2" ให้ส่ง dataStartRow=3 มาด้วยจากฝั่ง JS
+    //         // ถ้าไม่ส่งมา จะถือว่าข้อมูลเริ่มที่แถว 2 (หัวตารางแถว 1) เป็นค่า default
+    //         $dataStartRow = (int) ($request->input('dataStartRow') ?? 2);
+
+    //         // normalize helper (กัน space แปลก / zero-width / เคสภาษาไทย)
+    //         $normalize = function ($s) {
+    //             $s = (string)$s;
+    //             $s = str_replace("\xC2\xA0", ' ', $s); // NBSP -> space
+    //             $s = preg_replace('/[\x{200B}\x{200C}\x{200D}\x{FEFF}]/u', '', $s); // zero-width
+    //             $s = trim($s);
+    //             $s = preg_replace('/\s+/u', '', $s); // ลบช่องว่างทั้งหมด
+    //             return mb_strtolower($s, 'UTF-8');
+    //         };
+
+    //         // map หัวตารางที่คาดว่าจะเจอ -> คีย์มาตรฐาน
+    //         $headerSynonyms = [
+    //             'a_id'     => ['รหัสอาจารย์', 'a_id', 'รหัส', 'id'],
+    //             'a_fname'  => ['ชื่อ', 'fname', 'first_name', 'firstname'],
+    //             'a_lname'  => ['นามสกุล', 'lname', 'last_name', 'lastname'],
+    //             'major'    => ['สาขาวิชา', 'สาขา', 'major', 'ภาควิชา', 'หลักสูตร'],
+    //             'password' => ['รหัสผ่าน', 'password', 'pass'],
+    //             'a_type'   => ['ประเภท', 'type', 'บทบาท', 'role'],
+    //             'status'   => ['สถานะ', 'status', 'state'],
+    //         ];
+    //         $keyMap = [];
+    //         foreach ($headerSynonyms as $canon => $syns) {
+    //             foreach ($syns as $syn) $keyMap[$normalize($syn)] = $canon;
+    //         }
+
+    //         // map ชื่อสาขา -> id (normalize)
+    //         $majorMap = Major::pluck('id', 'm_name')
+    //             ->mapWithKeys(fn($id, $name) => [$normalize($name) => $id])
+    //             ->toArray();
+
+    //         // ค่าที่อนุญาต
+    //         $allowedTypes  = ['advisor', 'coadvisor', 'head', 'committee'];
+    //         $statusAliases = [
+    //             'active'   => ['active', 'ใช้งาน', 'เปิด', 'พร้อม', 'available'],
+    //             'inactive' => ['inactive', 'ไม่ใช้งาน', 'ปิด', 'พัก', 'unavailable'],
+    //         ];
+    //         $statusReverse = [];
+    //         foreach ($statusAliases as $std => $alts) {
+    //             foreach ($alts as $a) $statusReverse[$normalize($a)] = $std;
+    //         }
+
+    //         // เตรียมตรวจซ้ำใน DB ล่วงหน้า
+    //         $candidateIds = [];
+    //         foreach ($rows as $r) {
+    //             $nk = array_change_key_case(array_combine(
+    //                 array_map($normalize, array_keys($r)),
+    //                 array_values($r)
+    //             ));
+    //             $aIdGuess = $nk[$normalize('รหัสอาจารย์')] ?? $nk[$normalize('a_id')] ?? null;
+    //             if (!empty($aIdGuess)) $candidateIds[] = (string)$aIdGuess;
+    //         }
+    //         $existingSet = array_flip(
+    //             Advisor::whereIn('a_id', $candidateIds)->pluck('a_id')->toArray()
+    //         );
+
+    //         $inserted = 0;
+    //         $skippedDuplicates = 0;
+    //         $skippedInvalid = 0;
+    //         $warnings = [];
+    //         $excelAIds = []; // กันซ้ำในไฟล์เอง
+
+    //         DB::beginTransaction();
+
+    //         foreach ($rows as $index => $row) {
+    //             // เลขแถวจริงใน Excel (ให้ตรงกับที่ผู้ใช้เห็น)
+    //             $rowNumber = $index + $dataStartRow;
+
+    //             // สร้างแถว canonical keys
+    //             $normRow = [];
+    //             foreach ($row as $k => $v) {
+    //                 $nk = $normalize($k);
+    //                 if (isset($keyMap[$nk])) $normRow[$keyMap[$nk]] = is_string($v) ? trim($v) : $v;
+    //             }
+
+    //             $aId   = $normRow['a_id']    ?? null;
+    //             $fname = $normRow['a_fname'] ?? null;
+    //             $lname = $normRow['a_lname'] ?? null;
+    //             $major = $normRow['major']   ?? '';
+    //             $pass  = $normRow['password'] ?? null;
+    //             $atype = $normRow['a_type']  ?? 'advisor';
+    //             $statusRaw = $normRow['status'] ?? 'active';
+
+    //             // map major -> m_id
+    //             $mId = null;
+    //             if (!empty($major)) {
+    //                 $mId = $majorMap[$normalize($major)] ?? null;
+    //                 if (!$mId) $warnings[] = "แถว $rowNumber: สาขาวิชา \"{$major}\" ไม่พบในระบบ";
+    //             }
+
+    //             // ตรวจความครบ
+    //             if (empty($aId) || empty($fname) || empty($lname) || !$mId) {
+    //                 $warnings[] = "แถว $rowNumber: ข้อมูลไม่ครบหรือไม่ถูกต้อง (ต้องมี รหัสอาจารย์/ชื่อ/นามสกุล/สาขาวิชา)";
+    //                 $skippedInvalid++;
+    //                 continue;
+    //             }
+
+    //             // กันซ้ำในไฟล์
+    //             if (isset($excelAIds[$aId])) {
+    //                 $warnings[] = "แถว $rowNumber: รหัสอาจารย์ '$aId' ซ้ำกับข้อมูลในไฟล์ (แถว {$excelAIds[$aId]})";
+    //                 $skippedInvalid++;
+    //                 continue;
+    //             }
+    //             $excelAIds[$aId] = $rowNumber;
+
+    //             // กันซ้ำใน DB
+    //             if (isset($existingSet[$aId])) {
+    //                 $warnings[] = "แถว $rowNumber: รหัสอาจารย์ '$aId' มีอยู่แล้วในระบบ";
+    //                 $skippedDuplicates++;
+    //                 continue;
+    //             }
+
+    //             // sanitize a_type / status
+    //             $atypeNorm  = in_array($normalize($atype), $allowedTypes, true) ? $normalize($atype) : 'advisor';
+    //             $statusNorm = $statusReverse[$normalize($statusRaw)] ?? 'active';
+
+    //             // สร้างรหัสผ่านชั่วคราวถ้าไม่ส่งมา
+    //             if (empty($pass)) {
+    //                 $pass = Str::random(8);
+    //                 $warnings[] = "แถว $rowNumber: ไม่มีรหัสผ่าน → สร้างรหัสชั่วคราวให้แล้ว";
+    //             }
+
+    //             Advisor::create([
+    //                 'a_id'       => (string)$aId,
+    //                 'a_fname'    => (string)$fname,
+    //                 'a_lname'    => (string)$lname,
+    //                 'a_password' => Hash::make((string)$pass),
+    //                 'a_type'     => $atypeNorm,
+    //                 'status'     => $statusNorm,
+    //                 'm_id'       => $mId,
+    //             ]);
+
+    //             $existingSet[$aId] = true;
+    //             $inserted++;
+    //         }
+
+    //         DB::commit();
+
+    //         return response()->json([
+    //             'message'  => "นำเข้าสำเร็จ: $inserted รายการ (ข้ามซ้ำ: $skippedDuplicates, ไม่ผ่านตรวจสอบ: $skippedInvalid)",
+    //             'warnings' => $warnings,
+    //         ]);
+    //     } catch (\Throwable $e) {
+    //         DB::rollBack();
+    //         return response()->json([
+    //             'message' => 'เกิดข้อผิดพลาด: ' . $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
     public function importAdvisor(Request $request)
     {
         try {
@@ -120,21 +280,17 @@ class AdminController extends Controller
                 return response()->json(['message' => 'ไม่มีข้อมูลนำเข้า'], 400);
             }
 
-            // ถ้าไฟล์ของคุณหัวตารางอยู่ "แถว 2" ให้ส่ง dataStartRow=3 มาด้วยจากฝั่ง JS
-            // ถ้าไม่ส่งมา จะถือว่าข้อมูลเริ่มที่แถว 2 (หัวตารางแถว 1) เป็นค่า default
             $dataStartRow = (int) ($request->input('dataStartRow') ?? 2);
 
-            // normalize helper (กัน space แปลก / zero-width / เคสภาษาไทย)
             $normalize = function ($s) {
                 $s = (string)$s;
-                $s = str_replace("\xC2\xA0", ' ', $s); // NBSP -> space
-                $s = preg_replace('/[\x{200B}\x{200C}\x{200D}\x{FEFF}]/u', '', $s); // zero-width
+                $s = str_replace("\xC2\xA0", ' ', $s);
+                $s = preg_replace('/[\x{200B}\x{200C}\x{200D}\x{FEFF}]/u', '', $s);
                 $s = trim($s);
-                $s = preg_replace('/\s+/u', '', $s); // ลบช่องว่างทั้งหมด
+                $s = preg_replace('/\s+/u', '', $s);
                 return mb_strtolower($s, 'UTF-8');
             };
 
-            // map หัวตารางที่คาดว่าจะเจอ -> คีย์มาตรฐาน
             $headerSynonyms = [
                 'a_id'     => ['รหัสอาจารย์', 'a_id', 'รหัส', 'id'],
                 'a_fname'  => ['ชื่อ', 'fname', 'first_name', 'firstname'],
@@ -149,13 +305,11 @@ class AdminController extends Controller
                 foreach ($syns as $syn) $keyMap[$normalize($syn)] = $canon;
             }
 
-            // map ชื่อสาขา -> id (normalize)
             $majorMap = Major::pluck('id', 'm_name')
                 ->mapWithKeys(fn($id, $name) => [$normalize($name) => $id])
                 ->toArray();
 
-            // ค่าที่อนุญาต
-            $allowedTypes  = ['advisor', 'coadvisor', 'head', 'committee'];
+            $allowedTypes  = ['advisor', 'admin', 'teacher'];
             $statusAliases = [
                 'active'   => ['active', 'ใช้งาน', 'เปิด', 'พร้อม', 'available'],
                 'inactive' => ['inactive', 'ไม่ใช้งาน', 'ปิด', 'พัก', 'unavailable'],
@@ -165,33 +319,33 @@ class AdminController extends Controller
                 foreach ($alts as $a) $statusReverse[$normalize($a)] = $std;
             }
 
-            // เตรียมตรวจซ้ำใน DB ล่วงหน้า
             $candidateIds = [];
             foreach ($rows as $r) {
-                $nk = array_change_key_case(array_combine(
+                // ปรับให้สั้นลง ไม่ต้องใช้ array_change_key_case เพราะ normalize ทำ strtolower แล้ว
+                $nk = array_combine(
                     array_map($normalize, array_keys($r)),
                     array_values($r)
-                ));
-                $aIdGuess = $nk[$normalize('รหัสอาจารย์')] ?? $nk[$normalize('a_id')] ?? null;
+                );
+                $aIdGuess = $nk[$normalize('รหัสอาจารย์')] ?? $nk['a_id'] ?? null;
                 if (!empty($aIdGuess)) $candidateIds[] = (string)$aIdGuess;
             }
+
             $existingSet = array_flip(
                 Advisor::whereIn('a_id', $candidateIds)->pluck('a_id')->toArray()
             );
 
-            $inserted = 0;
             $skippedDuplicates = 0;
             $skippedInvalid = 0;
             $warnings = [];
-            $excelAIds = []; // กันซ้ำในไฟล์เอง
+            $excelAIds = [];
+            $insertData = []; // เตรียมไว้สำหรับ Bulk Insert
+            $now = now(); // เตรียม Timestamp ให้พร้อม
 
             DB::beginTransaction();
 
             foreach ($rows as $index => $row) {
-                // เลขแถวจริงใน Excel (ให้ตรงกับที่ผู้ใช้เห็น)
                 $rowNumber = $index + $dataStartRow;
 
-                // สร้างแถว canonical keys
                 $normRow = [];
                 foreach ($row as $k => $v) {
                     $nk = $normalize($k);
@@ -206,21 +360,18 @@ class AdminController extends Controller
                 $atype = $normRow['a_type']  ?? 'advisor';
                 $statusRaw = $normRow['status'] ?? 'active';
 
-                // map major -> m_id
                 $mId = null;
                 if (!empty($major)) {
                     $mId = $majorMap[$normalize($major)] ?? null;
                     if (!$mId) $warnings[] = "แถว $rowNumber: สาขาวิชา \"{$major}\" ไม่พบในระบบ";
                 }
 
-                // ตรวจความครบ
                 if (empty($aId) || empty($fname) || empty($lname) || !$mId) {
                     $warnings[] = "แถว $rowNumber: ข้อมูลไม่ครบหรือไม่ถูกต้อง (ต้องมี รหัสอาจารย์/ชื่อ/นามสกุล/สาขาวิชา)";
                     $skippedInvalid++;
                     continue;
                 }
 
-                // กันซ้ำในไฟล์
                 if (isset($excelAIds[$aId])) {
                     $warnings[] = "แถว $rowNumber: รหัสอาจารย์ '$aId' ซ้ำกับข้อมูลในไฟล์ (แถว {$excelAIds[$aId]})";
                     $skippedInvalid++;
@@ -228,35 +379,43 @@ class AdminController extends Controller
                 }
                 $excelAIds[$aId] = $rowNumber;
 
-                // กันซ้ำใน DB
                 if (isset($existingSet[$aId])) {
                     $warnings[] = "แถว $rowNumber: รหัสอาจารย์ '$aId' มีอยู่แล้วในระบบ";
                     $skippedDuplicates++;
                     continue;
                 }
 
-                // sanitize a_type / status
                 $atypeNorm  = in_array($normalize($atype), $allowedTypes, true) ? $normalize($atype) : 'advisor';
                 $statusNorm = $statusReverse[$normalize($statusRaw)] ?? 'active';
 
-                // สร้างรหัสผ่านชั่วคราวถ้าไม่ส่งมา
+                // แจ้งรหัสผ่านใน Warning เพื่อให้แอดมินทราบ
                 if (empty($pass)) {
-                    $pass = Str::random(8);
-                    $warnings[] = "แถว $rowNumber: ไม่มีรหัสผ่าน → สร้างรหัสชั่วคราวให้แล้ว";
+                    $pass = \Illuminate\Support\Str::random(8);
+                    $warnings[] = "แถว $rowNumber: ไม่มีรหัสผ่าน → สร้างรหัสชั่วคราว: {$pass}";
                 }
 
-                Advisor::create([
+                // เก็บลง Array แทนการ Create ทีละรอบ
+                $insertData[] = [
                     'a_id'       => (string)$aId,
                     'a_fname'    => (string)$fname,
                     'a_lname'    => (string)$lname,
-                    'a_password' => Hash::make((string)$pass),
+                    'a_password' => \Illuminate\Support\Facades\Hash::make((string)$pass),
                     'a_type'     => $atypeNorm,
                     'status'     => $statusNorm,
                     'm_id'       => $mId,
-                ]);
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
 
                 $existingSet[$aId] = true;
-                $inserted++;
+            }
+
+            // ทำ Bulk Insert (แบ่ง Chunk เผื่อกรณีไฟล์ใหญ่มากๆ เพื่อป้องกัน Binding Limits)
+            $inserted = count($insertData);
+            if ($inserted > 0) {
+                foreach (array_chunk($insertData, 500) as $chunk) {
+                    Advisor::insert($chunk);
+                }
             }
 
             DB::commit();
@@ -503,15 +662,8 @@ class AdminController extends Controller
             ->with('success', 'ลบประเภทโครงการเรียบร้อยแล้ว');
     }
 
+
     // Major setting
-    // public function majorIndex()
-    // {
-    //     $advisor = Auth::guard('advisors')->user();
-    //     $Major = Major::orderBy('id', 'asc')->paginate(10);
-
-    //     return view('admin.major.index', compact('advisor', 'Major'));
-    // }
-
     public function majorIndex(Request $request)
     {
         $advisor = Auth::guard('advisors')->user();
@@ -948,7 +1100,6 @@ class AdminController extends Controller
 
 
     //subtopic
-
     public function subindex(Request $request)
     {
         $advisor = Auth::guard('advisors')->user();

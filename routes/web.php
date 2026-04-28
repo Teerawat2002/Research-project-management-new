@@ -72,7 +72,7 @@ Route::middleware(['auth:students,advisors'])->group(function () {
 // Route::middleware(['auth:advisors', 'advisor.admin'])->group(function () {
 Route::middleware(['auth:advisors', AdvisorIsAdmin::class])->group(function () {
     Route::prefix('admin/advisor')->name('admin.advisor.')->group(function () {
-        Route::get('index', [AdminController::class, 'advisorIndex'])->name('index');
+        Route::get('index', [AdminController::class, 'advisorIndex'])->name('index')->defaults('title', 'จัดการข้อมูลอาจารย์');
         Route::get('create', [AdminController::class, 'advisorCreate'])->name('create');
         Route::post('store', [AdminController::class, 'advisorStore'])->name('store');
         Route::get('edit/{id}', [AdminController::class, 'advisorEdit'])->name('edit');
@@ -82,7 +82,7 @@ Route::middleware(['auth:advisors', AdvisorIsAdmin::class])->group(function () {
     });
 
     Route::prefix('admin/student')->name('admin.student.')->group(function () {
-        Route::get('index', [AdminController::class, 'studentIndex'])->name('index');
+        Route::get('index', [AdminController::class, 'studentIndex'])->name('index')->defaults('title', 'จัดการข้อมูลนักศึกษา');
         Route::get('create', [AdminController::class, 'studentCreate'])->name('create');
         Route::post('store', [AdminController::class, 'studentStore'])->name('store');
         Route::get('edit/{id}', [AdminController::class, 'studentEdit'])->name('edit');
@@ -92,7 +92,7 @@ Route::middleware(['auth:advisors', AdvisorIsAdmin::class])->group(function () {
     });
 
     Route::prefix('admin/major')->name('admin.major.')->group(function () {
-        Route::get('index', [AdminController::class, 'majorIndex'])->name('index');
+        Route::get('index', [AdminController::class, 'majorIndex'])->name('index')->defaults('title', 'จัดการข้อมูลสาขา');
         Route::get('create', [AdminController::class, 'majorCreate'])->name('create');
         Route::post('store', [AdminController::class, 'majorStore'])->name('store');
         Route::get('edit/{id}', [AdminController::class, 'majorEdit'])->name('edit');
@@ -101,14 +101,14 @@ Route::middleware(['auth:advisors', AdvisorIsAdmin::class])->group(function () {
     });
 
     Route::prefix('admin/academic-year')->name('admin.academic-year.')->group(function () {
-        Route::get('index', [AdminController::class, 'academicYearIndex'])->name('index');
+        Route::get('index', [AdminController::class, 'academicYearIndex'])->name('index')->defaults('title', 'จัดการข้อมูลปีการศึกษา');
         Route::get('create', [AdminController::class, 'yearcreate'])->name('create');
         Route::post('store', [AdminController::class, 'yearstore'])->name('store');
         Route::delete('delete/{id}', [AdminController::class, 'academicYearDelete'])->name('delete');
     });
 
     Route::prefix('admin/course')->name('admin.course.')->group(function () {
-        Route::get('index', [AdminController::class, 'courseIndex'])->name('index');
+        Route::get('index', [AdminController::class, 'courseIndex'])->name('index')->defaults('title', 'จัดการข้อมูลรายวิชา');
         Route::get('create', [AdminController::class, 'courseCreate'])->name('create');
         Route::post('store', [AdminController::class, 'courseStore'])->name('store');
         Route::get('course/{id}/edit', [AdminController::class, 'courseEdit'])->name('edit');
@@ -117,7 +117,7 @@ Route::middleware(['auth:advisors', AdvisorIsAdmin::class])->group(function () {
     });
 
     Route::prefix('admin/project-type')->name('admin.project-type.')->group(function () {
-        Route::get('index', [AdminController::class, 'projectTypeIndex'])->name('index');
+        Route::get('index', [AdminController::class, 'projectTypeIndex'])->name('index')->defaults('title', 'จัดการข้อมูลประเภทโครงการ');
         Route::get('create', [AdminController::class, 'projectTypeCreate'])->name('create');
         Route::post('store', [AdminController::class, 'projectTypeStore'])->name('store');
         Route::get('edit/{id}', [AdminController::class, 'projectTypeEdit'])->name('edit');
@@ -127,7 +127,7 @@ Route::middleware(['auth:advisors', AdvisorIsAdmin::class])->group(function () {
 
     Route::prefix('admin/topic')->name('admin.topic.')->group(function () {
         //maintopic
-        Route::get('maintopic/index', [AdminController::class, 'mainindex'])->name('maintopic.index');
+        Route::get('maintopic/index', [AdminController::class, 'mainindex'])->name('maintopic.index')->defaults('title', 'จัดการข้อมูลหัวข้อหลัก');
         Route::get('maintopic/create', [AdminController::class, 'maincreate'])->name('maintopic.create');
         Route::post('maintopic/store', [AdminController::class, 'mainstore'])->name('maintopic.store');
         Route::get('maintopic/edit/{id}', [AdminController::class, 'mainedit'])->name('maintopic.edit');
@@ -135,7 +135,7 @@ Route::middleware(['auth:advisors', AdvisorIsAdmin::class])->group(function () {
         Route::put('maintopic/{id}', [AdminController::class, 'mainupdate'])->name('maintopic.update');
 
         //subtipic
-        Route::get('subtopic/index', [AdminController::class, 'subindex'])->name('subtopic.index');
+        Route::get('subtopic/index', [AdminController::class, 'subindex'])->name('subtopic.index')->defaults('title', 'จัดการข้อมูลหัวข้อรอง');
         Route::get('subtopic/create', [AdminController::class, 'subcreate'])->name('subtopic.create');
         Route::post('subtopic/store', [AdminController::class, 'substore'])->name('subtopic.store');
         Route::get('subtopic/edit/{id}', [AdminController::class, 'subedit'])->name('subtopic.edit');
@@ -143,7 +143,7 @@ Route::middleware(['auth:advisors', AdvisorIsAdmin::class])->group(function () {
         Route::delete('subtopic/{id}', [AdminController::class, 'subdelete'])->name('subtopic.delete');
 
         //subsubtopic
-        Route::get('subsubtopic/index', [AdminController::class, 'subsubindex'])->name('subsubtopic.index');
+        Route::get('subsubtopic/index', [AdminController::class, 'subsubindex'])->name('subsubtopic.index')->defaults('title', 'จัดการข้อมูลหัวข้อรอง');
         Route::get('subsubtopic/create', [AdminController::class, 'subsubcreate'])->name('subsubtopic.create');
         Route::post('subsubtopic/store', [AdminController::class, 'subsubstore'])->name('subsubtopic.store');
         Route::get('subsubtopic/edit/{id}', [AdminController::class, 'subsubedit'])->name('subsubtopic.edit');
@@ -152,7 +152,7 @@ Route::middleware(['auth:advisors', AdvisorIsAdmin::class])->group(function () {
     });
 
     Route::prefix('admin/form')->name('admin.form.')->group(function () {
-        Route::get('index', [AdminController::class, 'formIndex'])->name('index');
+        Route::get('index', [AdminController::class, 'formIndex'])->name('index')->defaults('title', 'จัดการข้อมูลแบบฟอร์ม');
         Route::get('create', [AdminController::class, 'formcreate'])->name('create');
         Route::post('form', [AdminController::class, 'formstore'])->name('store');
         Route::get('addtopic/{id}', [AdminController::class, 'createTopics'])->name('add');
@@ -165,7 +165,7 @@ Route::middleware(['auth:advisors', AdvisorIsAdmin::class])->group(function () {
 
     Route::prefix('admin/alumni')->name('admin.alumni.')->group(function () {
         Route::prefix('project')->name('project.')->group(function () {
-            Route::get('index', [AdminController::class, 'alumniProjectIndex'])->name('index');
+            Route::get('index', [AdminController::class, 'alumniProjectIndex'])->name('index')->defaults('title', 'จัดการข้อมูลโครงการศิษย์เก่า');
             Route::get('create', [AdminController::class, 'alumniProjectCreate'])->name('create');
             Route::post('store', [AdminController::class, 'alumniProjectStore'])->name('store');
             Route::get('edit/{alumniProject}', [AdminController::class, 'alumniProjectEdit'])->name('edit');
