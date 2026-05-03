@@ -64,7 +64,7 @@ Route::middleware(['auth:students,advisors'])->group(function () {
         Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
     });
 
-    Route::get('teacher/calendar/home', [TeacherController::class, 'calendarHome'])->name('teacher.calendar.home');
+    Route::get('teacher/calendar/home', [TeacherController::class, 'calendarHome'])->name('teacher.calendar.home')->defaults('title', 'ปฏิทินการสอบ');
 });
 
 // Admin setting
@@ -329,7 +329,7 @@ Route::middleware([AdvisorIsAdmin::class . ':advisor,teacher', 'auth:advisors'])
 // Route::middleware(['auth:advisors'])->group(function () {
 Route::middleware([AdvisorIsAdmin::class . ':teacher', 'auth:advisors'])->group(function () {
     Route::prefix('teacher/calendar')->name('teacher.calendar.')->group(function () {
-        Route::get('index', [TeacherController::class, 'calendarIndex'])->name('index');
+        Route::get('index', [TeacherController::class, 'calendarIndex'])->name('index')->defaults('title', 'จัดการปฏิทินการสอบ');
         Route::get('create', [TeacherController::class, 'calendarCreate'])->name('create');
         Route::post('store', [TeacherController::class, 'calendarStore'])->name('store');
         Route::get('edit/{id}', [TeacherController::class, 'editCalendar'])->name('edit');

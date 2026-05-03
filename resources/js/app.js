@@ -20,21 +20,54 @@ import "flatpickr/dist/flatpickr.css";
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    // flatpickr
-    const startEl = document.querySelector("#datepicker-range-start");
-    const endEl = document.querySelector("#datepicker-range-end");
+    // ฟังก์ชันสำหรับผูก Flatpickr แบบ Range
+    function initDateRange(startSelector, endSelector) {
+        const startEl = document.querySelector(startSelector);
+        const endEl = document.querySelector(endSelector);
 
-    if (startEl && endEl) {
-        const startPicker = flatpickr(startEl, {
-            dateFormat: "Y-m-d",
-            onChange: (_, dateStr) => endPicker.set("minDate", dateStr),
-        });
+        if (startEl && endEl) {
+            // สร้าง Picker ขึ้นมาก่อน โดยยังไม่ผูก onChange ที่เกี่ยวข้องกัน
+            const startPicker = flatpickr(startEl, {
+                dateFormat: "Y-m-d", // <--- ค่าที่จะถูกส่งไป Backend
+                altInput: true, // <--- เปิดใช้งานการแสดงผลแยก
+                altFormat: "d-m-Y", // <--- รูปแบบที่โชว์ให้ผู้ใช้เห็น (วัน-เดือน-ปี)
+                allowInput: true
+            });
 
-        const endPicker = flatpickr(endEl, {
-            dateFormat: "Y-m-d",
-            onChange: (_, dateStr) => startPicker.set("maxDate", dateStr),
-        });
+            const endPicker = flatpickr(endEl, {
+                dateFormat: "Y-m-d", // <--- ค่าที่จะถูกส่งไป Backend
+                altInput: true, // <--- เปิดใช้งานการแสดงผลแยก
+                altFormat: "d-m-Y", // <--- รูปแบบที่โชว์ให้ผู้ใช้เห็น (วัน-เดือน-ปี)
+                allowInput: true
+            });
+
+            // หลังจากสร้างเสร็จ ค่อยมาผูก Event ทีหลัง เพื่อกันการวนลูปชนกันตอนเปิด Modal
+            startPicker.config.onChange.push(function (selectedDates, dateStr, instance) {
+                if (dateStr) {
+                    endPicker.set("minDate", dateStr);
+                }
+            });
+
+            endPicker.config.onChange.push(function (selectedDates, dateStr, instance) {
+                if (dateStr) {
+                    startPicker.set("maxDate", dateStr);
+                }
+            });
+
+            return {
+                startPicker,
+                endPicker
+            };
+        }
+        return null;
     }
+
+    // Flatpickr สำหรับ Modal Create
+    initDateRange("#start_date", "#end_date");
+
+    // Flatpickr สำหรับ Modal Edit
+    initDateRange("#edit_start_date", "#edit_end_date");
+
 
     // Select2
     if (!$.fn.select2) {

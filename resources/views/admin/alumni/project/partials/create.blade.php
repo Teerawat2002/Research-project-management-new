@@ -132,7 +132,7 @@
                                     <span class="text-red-500">*</span></label>
                                 <select name="student_ids[]" multiple required
                                     class="select2-multi block w-full px-3 py-2 text-sm border border-gray-200 rounded-lg dark:bg-gray-700 dark:border-gray-600"
-                                    data-placeholder="เลือกนักศึกษา">
+                                    data-placeholder="เลือกนักศึกษา สามารถเลือกได้มากกว่า 1 คน">
                                     @foreach ($students as $student)
                                         <option value="{{ $student->id }}">{{ $student->s_id }} -
                                             {{ $student->s_fname }} {{ $student->s_lname }}</option>
