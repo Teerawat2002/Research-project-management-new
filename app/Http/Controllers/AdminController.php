@@ -1242,7 +1242,7 @@ class AdminController extends Controller
             'score' => $request->score,
         ]);
 
-        return redirect()->route('admin.topic.subsubtopic.index')->with('success', 'Form created successfully!');
+        return redirect()->route('admin.topic.subsubtopic.index')->with('success', 'Sub-subtopic created successfully!');
     }
 
     public function subsubedit($id)
@@ -1285,140 +1285,236 @@ class AdminController extends Controller
 
 
     //Form setting
+    // public function formIndex()
+    // {
+    //     $advisor = Auth::guard('advisors')->user();
+    //     $formdata = Formset::orderBy('id', 'asc')
+    //         ->paginate(10);
+    //     return view('admin.form.index', compact('advisor', 'formdata'));
+    // }
+
+    // public function formcreate()
+    // {
+    //     // If you have an ExamType model, fetch all exam types for the dropdown
+    //     $project_types = ProjectType::all();
+
+    //     // Return the create formset view, passing in the project types
+    //     return view('admin.form.create', compact('project_types'));
+    // }
+
+    // public function formstore(Request $request)
+    // {
+    //     $request->validate([
+    //         'project_type_id' => ['required', 'exists:project_type,id'],
+    //         'name'         => ['required', 'string', 'max:255'],
+    //     ]);
+
+    //     // Formset::create([
+    //     //     'exam_type_id' => $request->exam_type_id,
+    //     //     'name'         => $request->name,
+    //     // ]);
+
+    //     $formset = Formset::create([
+    //         'project_type_id' => $request->project_type_id,
+    //         'name'         => $request->name,
+    //     ]);
+
+    //     return redirect()->route('admin.form.add', $formset->id)
+    //         ->with('success', 'Formset created successfully! Now add topics.');
+    // }
+
+    // public function createTopics($formsetId)
+    // {
+    //     $formset = Formset::findOrFail($formsetId);
+    //     // Fetch available topics (assumes you have a Topic model)
+    //     $topics = MainTopic::whereNull('form_id')->get();
+
+    //     return view('admin.form.addtopic', compact('formset', 'topics'));
+    // }
+
+    // public function storeTopics(Request $request, $forms)
+    // {
+    //     $formset = Formset::findOrFail($forms);
+
+    //     // Validate that 'main_topics' is an array of IDs that exist in main_topics
+    //     $request->validate([
+    //         'main_topics'   => 'required|array',
+    //         'main_topics.*' => 'exists:main_topics,id',
+    //     ]);
+
+    //     // 1) Assign the form_id to all selected topics
+    //     MainTopic::whereIn('id', $request->main_topics)
+    //         ->update(['form_id' => $formset->id]);
+
+    //     // 2) Optionally remove form_id from topics that were linked but are not selected now
+    //     MainTopic::where('form_id', $formset->id)
+    //         ->whereNotIn('id', $request->main_topics)
+    //         ->update(['form_id' => null]);
+
+    //     return redirect()->route('admin.form.index')
+    //         ->with('success', 'Main topics attached to the formset successfully!');
+    // }
+
+    // public function editTopics($id)
+    // {
+    //     // Find the formset by its ID
+    //     $formset = Formset::findOrFail($id);
+
+    //     // Retrieve topics that are either attached to this formset or not attached at all
+    //     $topics = MainTopic::where(function ($q) use ($formset) {
+    //         $q->where('form_id', $formset->id)
+    //             ->orWhereNull('form_id');
+    //     })->get();
+
+    //     // Return the view for editing topics with the formset and topics data
+    //     return view('admin.form.edittopic', compact('formset', 'topics'));
+    // }
+
+
+    // public function updateTopic(Request $request, $forms)
+    // {
+    //     $formset = Formset::findOrFail($forms);
+
+    //     // Validate the checkbox input
+    //     $request->validate([
+    //         'main_topics'   => 'nullable|array',
+    //         'main_topics.*' => 'exists:main_topics,id',
+    //     ]);
+
+    //     // If no topics were checked, default to an empty array
+    //     $selectedTopics = $request->input('main_topics', []);
+
+    //     // 1) Assign form_id to all selected topics
+    //     if (!empty($selectedTopics)) {
+    //         MainTopic::whereIn('id', $selectedTopics)
+    //             ->update(['form_id' => $formset->id]);
+    //     }
+
+    //     // 2) Remove form_id from topics that were previously linked but are now unselected
+    //     MainTopic::where('form_id', $formset->id)
+    //         ->whereNotIn('id', $selectedTopics)
+    //         ->update(['form_id' => null]);
+
+    //     return redirect()->route('admin.form.index')
+    //         ->with('success', 'Main topics updated successfully!');
+    // }
+
+    // public function formdelete($id)
+    // {
+    //     $formset = Formset::findOrFail($id);
+
+    //     // Optionally, remove the association with main topics before deleting the formset.
+    //     MainTopic::where('form_id', $formset->id)->update(['form_id' => null]);
+
+    //     // Delete the formset record.
+    //     $formset->delete();
+
+    //     return redirect()->route('admin.form.index')
+    //         ->with('success', 'Formset deleted successfully!');
+    // }
+
+    // public function show($id)
+    // {
+    //     // Retrieve the formset by its ID
+    //     $formset = Formset::findOrFail($id);
+
+    //     // Eager load subtopics and subsubtopics for each main topic
+    //     $attachedTopics = MainTopic::with(['sub_topics.subsub_topics'])
+    //         ->where('form_id', $formset->id)
+    //         ->get();
+
+    //     return view('admin.form.show', compact('formset', 'attachedTopics'));
+    // }
+
     public function formIndex()
     {
         $advisor = Auth::guard('advisors')->user();
-        $formdata = Formset::orderBy('id', 'asc')
-            ->paginate(10);
-        return view('admin.form.index', compact('advisor', 'formdata'));
-    }
 
-    public function formcreate()
-    {
-        // If you have an ExamType model, fetch all exam types for the dropdown
+        // ดึงข้อมูลฟอร์ม พร้อมแบ่งหน้า
+        $formdata = Formset::orderBy('id', 'asc')->paginate(10);
+
+        // ดึงข้อมูล ProjectType สำหรับนำไปแสดงใน Dropdown ของ Modal สร้างฟอร์ม
         $project_types = ProjectType::all();
 
-        // Return the create formset view, passing in the project types
-        return view('admin.form.create', compact('project_types'));
+        return view('admin.form.index', compact('advisor', 'formdata', 'project_types'));
     }
 
     public function formstore(Request $request)
     {
         $request->validate([
+            // ตรวจสอบชื่อตารางในฐานข้อมูลของคุณด้วยนะครับ (ปกติมักจะเป็นเติม s เช่น project_types)
             'project_type_id' => ['required', 'exists:project_type,id'],
-            'name'         => ['required', 'string', 'max:255'],
+            'name'            => ['required', 'string', 'max:255'],
         ]);
-
-        // Formset::create([
-        //     'exam_type_id' => $request->exam_type_id,
-        //     'name'         => $request->name,
-        // ]);
 
         $formset = Formset::create([
             'project_type_id' => $request->project_type_id,
-            'name'         => $request->name,
+            'name'            => $request->name,
         ]);
 
-        return redirect()->route('admin.form.add', $formset->id)
-            ->with('success', 'Formset created successfully! Now add topics.');
-    }
-
-    public function createTopics($formsetId)
-    {
-        $formset = Formset::findOrFail($formsetId);
-        // Fetch available topics (assumes you have a Topic model)
-        $topics = MainTopic::whereNull('form_id')->get();
-
-        return view('admin.form.addtopic', compact('formset', 'topics'));
-    }
-
-    public function storeTopics(Request $request, $forms)
-    {
-        $formset = Formset::findOrFail($forms);
-
-        // Validate that 'main_topics' is an array of IDs that exist in main_topics
-        $request->validate([
-            'main_topics'   => 'required|array',
-            'main_topics.*' => 'exists:main_topics,id',
-        ]);
-
-        // 1) Assign the form_id to all selected topics
-        MainTopic::whereIn('id', $request->main_topics)
-            ->update(['form_id' => $formset->id]);
-
-        // 2) Optionally remove form_id from topics that were linked but are not selected now
-        MainTopic::where('form_id', $formset->id)
-            ->whereNotIn('id', $request->main_topics)
-            ->update(['form_id' => null]);
-
-        return redirect()->route('admin.form.index')
-            ->with('success', 'Main topics attached to the formset successfully!');
+        // บันทึกเสร็จ เด้งไปหน้าเลือกหัวข้อทันที
+        return redirect()->route('admin.form.editTopic', $formset->id)
+            ->with('success', 'สร้างแบบฟอร์มสำเร็จ! กรุณาเลือกหัวข้อที่ต้องการผูกเข้ากับฟอร์มนี้');
     }
 
     public function editTopics($id)
     {
-        // Find the formset by its ID
         $formset = Formset::findOrFail($id);
 
-        // Retrieve topics that are either attached to this formset or not attached at all
+        // ดึงหัวข้อที่ถูกผูกกับฟอร์มนี้ หรือ หัวข้อที่ยังไม่ถูกผูกกับฟอร์มใดๆ เลย
         $topics = MainTopic::where(function ($q) use ($formset) {
             $q->where('form_id', $formset->id)
                 ->orWhereNull('form_id');
         })->get();
 
-        // Return the view for editing topics with the formset and topics data
-        return view('admin.form.edittopic', compact('formset', 'topics'));
+        return view('admin.form.editTopic', compact('formset', 'topics'));
     }
-
 
     public function updateTopic(Request $request, $forms)
     {
         $formset = Formset::findOrFail($forms);
 
-        // Validate the checkbox input
         $request->validate([
             'main_topics'   => 'nullable|array',
             'main_topics.*' => 'exists:main_topics,id',
         ]);
 
-        // If no topics were checked, default to an empty array
         $selectedTopics = $request->input('main_topics', []);
 
-        // 1) Assign form_id to all selected topics
+        // 1) เพิ่มฟอร์ม ID ให้กับหัวข้อที่ถูกติ๊กเลือก
         if (!empty($selectedTopics)) {
             MainTopic::whereIn('id', $selectedTopics)
                 ->update(['form_id' => $formset->id]);
         }
 
-        // 2) Remove form_id from topics that were previously linked but are now unselected
+        // 2) ถอดฟอร์ม ID ออกจากหัวข้อที่เคยถูกเลือก แต่ตอนนี้ถูกติ๊กออกแล้ว
         MainTopic::where('form_id', $formset->id)
             ->whereNotIn('id', $selectedTopics)
             ->update(['form_id' => null]);
 
         return redirect()->route('admin.form.index')
-            ->with('success', 'Main topics updated successfully!');
+            ->with('success', 'บันทึกการจัดกลุ่มหัวข้อเรียบร้อยแล้ว!');
     }
 
     public function formdelete($id)
     {
         $formset = Formset::findOrFail($id);
 
-        // Optionally, remove the association with main topics before deleting the formset.
+        // คืนค่า form_id ของ MainTopic ให้เป็น null ก่อนลบแบบฟอร์ม
         MainTopic::where('form_id', $formset->id)->update(['form_id' => null]);
 
-        // Delete the formset record.
+        // ลบแบบฟอร์ม
         $formset->delete();
 
         return redirect()->route('admin.form.index')
-            ->with('success', 'Formset deleted successfully!');
+            ->with('success', 'ลบแบบฟอร์มสำเร็จเรียบร้อย!');
     }
 
     public function show($id)
     {
-        // Retrieve the formset by its ID
         $formset = Formset::findOrFail($id);
 
-        // Eager load subtopics and subsubtopics for each main topic
+        // โหลดข้อมูลแบบ Eager Loading (หัวข้อหลัก -> หัวข้อรอง -> หัวข้อย่อย)
         $attachedTopics = MainTopic::with(['sub_topics.subsub_topics'])
             ->where('form_id', $formset->id)
             ->get();
