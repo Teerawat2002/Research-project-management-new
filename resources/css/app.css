@@ -2,13 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================
+   1. LIGHT MODE (DEFAULT / BASE STYLES)
+   ========================================== */
 
-/* container */
+/* --- Select2: Container --- */
 .select2-container {
     width: 100% !important;
 }
 
-/* กล่อง select */
+/* --- Select2: กล่อง Select (Single) --- */
 .select2-container--default .select2-selection--single {
     height: 44px;
     /* เท่ากับ input + file */
@@ -17,12 +20,11 @@
     /* rounded-lg */
     border: 1px solid #d1d5db;
     /* gray-300 */
-    background-color: #fff;
+    background-color: #ffffff;
     display: flex;
     align-items: center;
 }
 
-/* ข้อความที่เลือก */
 .select2-selection--single .select2-selection__rendered {
     padding-left: 0;
     line-height: normal;
@@ -32,40 +34,39 @@
     /* gray-900 */
 }
 
-/* ลูกศร */
 .select2-selection--single .select2-selection__arrow {
     height: 100%;
     right: 8px;
 }
 
-
+/* --- Select2: กล่อง Select (Multiple) --- */
 .select2-container--default .select2-selection--multiple {
     min-height: 44px;
     padding: 4px 8px;
     border-radius: 0.5rem;
     border: 1px solid #d1d5db;
-    background-color: #fff;
+    background-color: #ffffff;
 }
 
-/* tag นักศึกษา */
+/* Tag นักศึกษา */
 .select2-selection--multiple .select2-selection__choice {
     background-color: #2563eb;
     /* blue-600 */
     border: none;
-    color: #fff;
+    color: #ffffff;
     font-size: 0.75rem;
     padding: 3px 8px;
     border-radius: 0.375rem;
     margin-top: 4px;
 }
 
-/* ปุ่ม x */
+/* ปุ่ม x ใน Tag */
 .select2-selection__choice__remove {
-    color: #fff;
+    color: #ffffff;
     margin-right: 6px;
 }
 
-
+/* --- Select2: กล่อง Dropdown ที่เด้งลงมา --- */
 .select2-dropdown {
     border-radius: 0.5rem;
     border: 1px solid #d1d5db;
@@ -78,29 +79,16 @@
 
 .select2-results__option--highlighted {
     background-color: #2563eb;
-    color: #fff;
+    color: #ffffff;
 }
 
-.dark .select2-container--default .select2-selection--single,
-.dark .select2-container--default .select2-selection--multiple {
-    background-color: #374151;
-    /* gray-700 */
-    border-color: #4b5563;
-    /* gray-600 */
-}
-
-.dark .select2-selection__rendered {
-    color: #fff;
-}
-
-
-/* ===== File input unified style ===== */
+/* --- File Input --- */
 input[type="file"] {
     height: 44px;
     border: 1px solid #d1d5db;
     border-radius: 0.5rem;
     font-size: 0.875rem;
-    background-color: #fff;
+    background-color: #ffffff;
     color: #111827;
     padding: 0;
     overflow: hidden;
@@ -122,7 +110,7 @@ input[type="file"]::file-selector-button {
     border-radius: 0.5rem 0 0 0.5rem;
     background-color: #2563eb;
     /* blue-600 */
-    color: #fff;
+    color: #ffffff;
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
@@ -133,10 +121,97 @@ input[type="file"]::file-selector-button:hover {
     /* blue-700 */
 }
 
+
+/* ==========================================
+   2. DARK MODE STYLES (.dark)
+   ========================================== */
+
+/* --- Select2: พื้นหลังกล่อง Select หลัก --- */
+.dark .select2-container--default .select2-selection--single,
+.dark .select2-container--default .select2-selection--multiple {
+    background-color: #374151 !important;
+    /* gray-700 */
+    border-color: #4b5563 !important;
+    /* gray-600 */
+}
+
+/* --- Select2: ข้อความและ Placeholder (Single / Multiple) --- */
+.dark .select2-container--default .select2-selection--single .select2-selection__rendered,
+.dark .select2-container--default .select2-selection--multiple .select2-search__field {
+    color: #ffffff !important;
+}
+
+.dark .select2-container--default .select2-selection--single .select2-selection__placeholder,
+.dark .select2-container--default .select2-selection--multiple .select2-search__field::placeholder {
+    color: #9ca3af !important;
+    /* gray-400 */
+}
+
+/* --- Select2: Tag ข้อมูลที่เลือกแล้ว (Multiple) --- */
+.dark .select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border: 1px solid #1d4ed8 !important;
+}
+
+/* ปุ่ม x ใน Tag */
+.dark .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: #ffffff !important;
+    border-right: 1px solid #1d4ed8 !important;
+}
+
+/* ปุ่ม x เมื่อ Hover */
+.dark .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
+    background-color: #ef4444 !important;
+    /* red-500 */
+    color: #ffffff !important;
+}
+
+/* --- Select2: กล่อง Dropdown ที่เด้งลงมา (Dark) --- */
+.dark .select2-dropdown {
+    background-color: #374151 !important;
+    /* gray-700 */
+    border-color: #4b5563 !important;
+    /* gray-600 */
+}
+
+/* ช่องพิมพ์ค้นหาใน Dropdown */
+.dark .select2-search--dropdown .select2-search__field {
+    background-color: #1f2937 !important;
+    /* gray-800 */
+    border-color: #4b5563 !important;
+    /* gray-600 */
+    color: #ffffff !important;
+}
+
+/* รายการตัวเลือกปกติ */
+.dark .select2-results__option {
+    background-color: #374151 !important;
+    /* gray-700 */
+    color: #e5e7eb !important;
+    /* gray-200 */
+}
+
+/* รายการตัวเลือกที่ถูก Hover อยู่ */
+.dark .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: #2563eb !important;
+    /* blue-600 */
+    color: #ffffff !important;
+}
+
+/* รายการตัวเลือกที่ถูกเลือกไปแล้ว (Multiple) */
+.dark .select2-results__option[aria-selected="true"] {
+    background-color: #4b5563 !important;
+    /* gray-600 */
+    color: #9ca3af !important;
+    /* gray-400 */
+}
+
+/* --- File Input (Dark) --- */
 .dark input[type="file"] {
     background-color: #374151;
     border-color: #4b5563;
-    color: #fff;
+    color: #ffffff;
 }
 
 .dark input[type="file"]::file-selector-button {

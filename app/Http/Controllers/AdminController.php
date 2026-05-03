@@ -1522,40 +1522,107 @@ class AdminController extends Controller
         return view('admin.form.show', compact('formset', 'attachedTopics'));
     }
 
+
     // Alumni Setting
+    // public function alumniProjectIndex(Request $request)
+    // {
+    //     $project_types = ProjectType::all();
+
+    //     $alumniProjects = AlumniProject::with(['projectType', 'advisor'])
+    //         ->when($request->project_type_id, function ($query) use ($request) {
+    //             $query->where('project_type_id', $request->project_type_id);
+    //         })
+    //         ->when($request->search, function ($query) use ($request) {
+    //             $search = $request->search;
+    //             $query->where(function ($q) use ($search) {
+    //                 $q->where('title', 'like', "%{$search}%")
+    //                     ->orWhere('keyword', 'like', "%{$search}%");
+    //             });
+    //         })
+    //         ->orderBy('id', 'asc')
+    //         ->paginate(10)
+    //         ->withQueryString();
+
+    //     return view(
+    //         'admin.alumni.project.index',
+    //         compact('project_types', 'alumniProjects')
+    //     );
+    // }
     public function alumniProjectIndex(Request $request)
     {
         $project_types = ProjectType::all();
+        $academicYears = AcademicYear::all();
+        $advisors = Advisor::where('a_type', '!=', 'admin')->get();
+        $students = Student::where('status', 'graduated')->get();
+        $search = $request->search;
+        $filterTypeId = $request->project_type_id;
 
-        $alumniProjects = AlumniProject::with(['projectType', 'advisor'])
-            ->when($request->project_type_id, function ($query) use ($request) {
-                $query->where('project_type_id', $request->project_type_id);
-            })
-            ->when($request->search, function ($query) use ($request) {
-                $search = $request->search;
-                $query->where(function ($q) use ($search) {
-                    $q->where('title', 'like', "%{$search}%")
-                        ->orWhere('keyword', 'like', "%{$search}%");
-                });
-            })
-            ->orderBy('id', 'asc')
-            ->paginate(10)
-            ->withQueryString();
+        $groupedProjects = [];
+
+        // 1. ดึงข้อมูลโครงงานที่มีประเภท
+        // ถ้ามีการเลือก Dropdown จะดึงแค่ประเภทที่เลือก ถ้าไม่เลือกจะดึงทั้งหมด
+        $typesToFetch = $filterTypeId ? $project_types->where('id', $filterTypeId) : $project_types;
+
+        foreach ($typesToFetch as $type) {
+            // $projects = AlumniProject::with(['projectType', 'advisor'])
+            $projects = AlumniProject::with(['projectType', 'advisor', 'files', 'projectGroup.group_members'])
+                ->where('project_type_id', $type->id)
+                ->when($search, function ($query) use ($search) {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('title', 'like', "%{$search}%")
+                            ->orWhere('keyword', 'like', "%{$search}%");
+                    });
+                })
+                ->orderBy('id', 'desc')
+                // แบ่งหน้าทีละ 16 และตั้งชื่อ parameter URL ให้ไม่ซ้ำกันตาม ID ประเภท (เช่น ?page_type_1=2)
+                ->paginate(16, ['*'], 'page_type_' . $type->id)
+                ->withQueryString();
+
+            // เก็บลง Array เฉพาะประเภทที่มีข้อมูล (หรือกรณีที่ตั้งใจ Filter หาประเภทนี้)
+            if ($projects->isNotEmpty() || $filterTypeId) {
+                $groupedProjects[$type->name] = $projects;
+            }
+        }
+
+        // 2. ดึงข้อมูลโครงงานที่ "ไม่ได้ระบุประเภท" (ถ้าผู้ใช้ไม่ได้กรองประเภทใดประเภทหนึ่งไว้)
+        if (!$filterTypeId) {
+            $untypedProjects = AlumniProject::with(['projectType', 'advisor'])
+                ->whereNull('project_type_id')
+                ->when($search, function ($query) use ($search) {
+                    $query->where(function ($q) use ($search) {
+                        $q->where('title', 'like', "%{$search}%")
+                            ->orWhere('keyword', 'like', "%{$search}%");
+                    });
+                })
+                ->orderBy('id', 'desc')
+                ->paginate(16, ['*'], 'page_untyped')
+                ->withQueryString();
+
+            if ($untypedProjects->isNotEmpty()) {
+                $groupedProjects['โครงงานที่ไม่ได้ระบุประเภท'] = $untypedProjects;
+            }
+        }
 
         return view(
             'admin.alumni.project.index',
-            compact('project_types', 'alumniProjects')
+            compact(
+                'project_types',
+                'groupedProjects',
+                'academicYears',
+                'advisors',
+                'students'
+            )
         );
     }
 
-    public function alumniProjectCreate()
-    {
-        $project_types = ProjectType::all();
-        $advisors = Advisor::all();
-        $academicYears = AcademicYear::all();
-        $students = Student::where('status', 'graduated')->get();
-        return view('admin.alumni.project.create', compact('project_types', 'advisors', 'academicYears', 'students'));
-    }
+    // public function alumniProjectCreate()
+    // {
+    //     $project_types = ProjectType::all();
+    //     $advisors = Advisor::where('a_type', '!=', 'admin')->get();
+    //     $academicYears = AcademicYear::all();
+    //     $students = Student::where('status', 'graduated')->get();
+    //     return view('admin.alumni.project.create', compact('project_types', 'advisors', 'academicYears', 'students'));
+    // }
 
     public function alumniProjectStore(Request $request)
     {
@@ -1667,37 +1734,166 @@ class AdminController extends Controller
         }
     }
 
-    public function alumniProjectEdit(AlumniProject $alumniProject)
-    {
-        $project_types = ProjectType::all();
-        $advisors = Advisor::all();
-        $academicYears = AcademicYear::all();
-        $students = Student::where('status', 'graduated')->get();
+    // public function alumniProjectEdit(AlumniProject $alumniProject)
+    // {
+    //     $project_types = ProjectType::all();
+    //     $advisors = Advisor::where('a_type', '!=', 'admin')->get();
+    //     $academicYears = AcademicYear::all();
+    //     $students = Student::where('status', 'graduated')->get();
 
-        // นักศึกษาในกลุ่มเดิม
-        $selectedStudents = GroupMember::where(
-            'group_id',
-            $alumniProject->project_group_id
-        )->pluck('s_id')->toArray();
+    //     // นักศึกษาในกลุ่มเดิม
+    //     $selectedStudents = GroupMember::where(
+    //         'group_id',
+    //         $alumniProject->project_group_id
+    //     )->pluck('s_id')->toArray();
 
-        $uploadFile = UploadFile::where([
-            'fileable_id' => $alumniProject->id,
-            'fileable_type' => AlumniProject::class
-        ])->first();
+    //     $uploadFile = UploadFile::where([
+    //         'fileable_id' => $alumniProject->id,
+    //         'fileable_type' => AlumniProject::class
+    //     ])->first();
 
-        return view(
-            'admin.alumni.project.edit',
-            compact(
-                'alumniProject',
-                'project_types',
-                'advisors',
-                'academicYears',
-                'students',
-                'selectedStudents',
-                'uploadFile'
-            )
-        );
-    }
+    //     return view(
+    //         'admin.alumni.project.edit',
+    //         compact(
+    //             'alumniProject',
+    //             'project_types',
+    //             'advisors',
+    //             'academicYears',
+    //             'students',
+    //             'selectedStudents',
+    //             'uploadFile'
+    //         )
+    //     );
+    // }
+
+    // public function alumniProjectUpdate(Request $request, AlumniProject $alumniProject)
+    // {
+    //     $request->validate([
+    //         'title' => 'required|string|max:255',
+    //         'keyword' => 'required|string|max:255',
+    //         'project_type_id' => 'required|exists:project_type,id',
+    //         'academic_year' => 'required|exists:academic_years,id',
+    //         'advisor_id' => 'required|exists:advisors,id',
+    //         'student_ids' => 'required|array|min:1',
+    //         'student_ids.*' => 'exists:students,id',
+
+    //         'cover_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:51200',
+    //         'abstract_file' => 'nullable|file|mimes:pdf|max:51200',
+    //         'project_file' => 'nullable|file|mimes:pdf|max:51200',
+    //     ]);
+
+    //     DB::beginTransaction();
+
+    //     try {
+    //         /* =========================
+    //      * 1. Update Project Group
+    //      * ========================= */
+    //         $projectGroup = ProjectGroup::findOrFail($alumniProject->project_group_id);
+    //         $projectGroup->update([
+    //             'ac_id' => $request->academic_year,
+    //         ]);
+
+    //         /* =========================
+    //      * 2. Update Group Members
+    //      * ========================= */
+    //         GroupMember::where('group_id', $projectGroup->id)->delete();
+
+    //         foreach ($request->student_ids as $studentId) {
+    //             GroupMember::create([
+    //                 'group_id' => $projectGroup->id,
+    //                 's_id' => $studentId,
+    //             ]);
+    //         }
+
+    //         /* =========================
+    //      * 3. Update Alumni Project
+    //      * ========================= */
+    //         $alumniProject->update([
+    //             'title' => $request->title,
+    //             'keyword' => $request->keyword,
+    //             'project_type_id' => $request->project_type_id,
+    //             'advisor_id' => $request->advisor_id,
+    //         ]);
+
+    //         /* =========================
+    //     * 4. Update Files (ถ้ามี)
+    //     * ========================= */
+    //         $uploadFile = UploadFile::where([
+    //             'fileable_id' => $alumniProject->id,
+    //             'fileable_type' => AlumniProject::class
+    //         ])->first();
+
+    //         $basePath = 'uploads/alumni_projects/' . $alumniProject->id;
+
+    //         /* ===== Cover ===== */
+    //         if ($request->hasFile('cover_file')) {
+    //             if ($uploadFile->cover_file) {
+    //                 Storage::disk('public')->delete($uploadFile->cover_file);
+    //             }
+
+    //             $coverFile = $request->file('cover_file');
+    //             $coverName = 'cover_' . Str::uuid() . '.' . $coverFile->getClientOriginalExtension();
+
+    //             $coverPath = $coverFile->storeAs(
+    //                 $basePath . '/cover',
+    //                 $coverName,
+    //                 'public'
+    //             );
+
+    //             $uploadFile->cover_file = $coverPath;
+    //         }
+
+    //         /* ===== Abstract ===== */
+    //         if ($request->hasFile('abstract_file')) {
+    //             if ($uploadFile->abstract_file) {
+    //                 Storage::disk('public')->delete($uploadFile->abstract_file);
+    //             }
+
+    //             $abstractFile = $request->file('abstract_file');
+    //             $abstractName = 'abstract_' . Str::uuid() . '.' . $abstractFile->getClientOriginalExtension();
+
+    //             $abstractPath = $abstractFile->storeAs(
+    //                 $basePath . '/abstract',
+    //                 $abstractName,
+    //                 'public'
+    //             );
+
+    //             $uploadFile->abstract_file = $abstractPath;
+    //         }
+
+    //         /* ===== Project ===== */
+    //         if ($request->hasFile('project_file')) {
+    //             if ($uploadFile->project_file) {
+    //                 Storage::disk('public')->delete($uploadFile->project_file);
+    //             }
+
+    //             $projectFile = $request->file('project_file');
+    //             $projectName = 'project_' . Str::uuid() . '.' . $projectFile->getClientOriginalExtension();
+
+    //             $projectPath = $projectFile->storeAs(
+    //                 $basePath . '/project',
+    //                 $projectName,
+    //                 'public'
+    //             );
+
+    //             $uploadFile->project_file = $projectPath;
+    //         }
+
+    //         $uploadFile->save();
+
+    //         DB::commit();
+
+    //         return redirect()
+    //             ->route('admin.alumni.project.index')
+    //             ->with('success', 'แก้ไขโครงงานศิษย์เก่าสำเร็จ');
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+
+    //         return back()
+    //             ->withErrors(['error' => $e->getMessage()])
+    //             ->withInput();
+    //     }
+    // }
 
     public function alumniProjectUpdate(Request $request, AlumniProject $alumniProject)
     {
@@ -1749,12 +1945,14 @@ class AdminController extends Controller
             ]);
 
             /* =========================
-        * 4. Update Files (ถ้ามี)
-        * ========================= */
-            $uploadFile = UploadFile::where([
+         * 4. Update Files
+         * ========================= */
+
+            // ใช้ firstOrNew เพื่อป้องกัน Error กรณีไม่มี Record เดิม
+            $uploadFile = UploadFile::firstOrNew([
                 'fileable_id' => $alumniProject->id,
                 'fileable_type' => AlumniProject::class
-            ])->first();
+            ]);
 
             $basePath = 'uploads/alumni_projects/' . $alumniProject->id;
 
@@ -1763,16 +1961,9 @@ class AdminController extends Controller
                 if ($uploadFile->cover_file) {
                     Storage::disk('public')->delete($uploadFile->cover_file);
                 }
-
                 $coverFile = $request->file('cover_file');
                 $coverName = 'cover_' . Str::uuid() . '.' . $coverFile->getClientOriginalExtension();
-
-                $coverPath = $coverFile->storeAs(
-                    $basePath . '/cover',
-                    $coverName,
-                    'public'
-                );
-
+                $coverPath = $coverFile->storeAs($basePath . '/cover', $coverName, 'public');
                 $uploadFile->cover_file = $coverPath;
             }
 
@@ -1781,16 +1972,9 @@ class AdminController extends Controller
                 if ($uploadFile->abstract_file) {
                     Storage::disk('public')->delete($uploadFile->abstract_file);
                 }
-
                 $abstractFile = $request->file('abstract_file');
                 $abstractName = 'abstract_' . Str::uuid() . '.' . $abstractFile->getClientOriginalExtension();
-
-                $abstractPath = $abstractFile->storeAs(
-                    $basePath . '/abstract',
-                    $abstractName,
-                    'public'
-                );
-
+                $abstractPath = $abstractFile->storeAs($basePath . '/abstract', $abstractName, 'public');
                 $uploadFile->abstract_file = $abstractPath;
             }
 
@@ -1799,19 +1983,13 @@ class AdminController extends Controller
                 if ($uploadFile->project_file) {
                     Storage::disk('public')->delete($uploadFile->project_file);
                 }
-
                 $projectFile = $request->file('project_file');
                 $projectName = 'project_' . Str::uuid() . '.' . $projectFile->getClientOriginalExtension();
-
-                $projectPath = $projectFile->storeAs(
-                    $basePath . '/project',
-                    $projectName,
-                    'public'
-                );
-
+                $projectPath = $projectFile->storeAs($basePath . '/project', $projectName, 'public');
                 $uploadFile->project_file = $projectPath;
             }
 
+            // เซฟข้อมูลไฟล์ (ไม่ว่าจะเป็นการอัปเดตไฟล์เดิม หรือสร้าง Record ใหม่)
             $uploadFile->save();
 
             DB::commit();
