@@ -1104,10 +1104,10 @@ class AdminController extends Controller
     {
         $advisor = Auth::guard('advisors')->user();
         $search = $request->input('search');
-        $maintopicFilter = $request->input('maintopic_id'); // Can be empty, 'unattached', or a numeric id
+        $maintopicFilter = $request->input('maintopic_id');
 
-        // Fetch all MainTopics for the dropdown filter
-        $maintopics = MainTopic::all();
+        // ดึงข้อมูล MainTopic ทั้งหมดเพื่อใช้ใน Dropdown ทั้งส่วน Filter และ Modal (ปรับชื่อตัวแปรเป็น $main_topics)
+        $main_topics = MainTopic::all();
 
         $sub_topics = SubTopic::when($search, function ($query, $search) {
             return $query->where('name', 'like', "%{$search}%");
@@ -1126,44 +1126,25 @@ class AdminController extends Controller
                 'maintopic_id' => $maintopicFilter
             ]);
 
-        return view('admin.topic.subtopic.index', compact('advisor', 'sub_topics', 'search', 'maintopicFilter', 'maintopics'));
-    }
-
-
-    public function subcreate()
-    {
-
-        $advisor = Auth::guard('advisors')->user();
-        $sub_topics = SubTopic::all();
-        $main_topics = MainTopic::all();
-        return view('admin.topic.subtopic.create', compact('advisor', 'sub_topics', 'main_topics'));
+        return view('admin.topic.subtopic.index', compact('advisor', 'sub_topics', 'search', 'maintopicFilter', 'main_topics'));
     }
 
     public function substore(Request $request)
     {
         $request->validate([
             'mtopic_id' => ['required', 'exists:main_topics,id'],
-            'name' => ['required', 'string', 'max:255'],
-            'score' => ['required', 'numeric'],
-
+            'name'      => ['required', 'string', 'max:255'],
+            'score'     => ['required', 'numeric', 'min:0'],
         ]);
 
         SubTopic::create([
-            'name' => $request->name,
-            'score' => $request->score,
             'mtopic_id' => $request->mtopic_id,
+            'name'      => $request->name,
+            'score'     => $request->score,
         ]);
 
-        return redirect()->route('admin.topic.subtopic.index')->with('success', 'Form created successfully!');
-    }
-
-    public function subedit($id)
-    {
-        $advisor = Auth::guard('advisors')->user();
-        $subTopic = SubTopic::findOrFail($id);
-        $main_topics = MainTopic::all();
-
-        return view('admin.topic.subtopic.edit', compact('advisor', 'subTopic', 'main_topics'));
+        return redirect()->route('admin.topic.subtopic.index')
+            ->with('success', 'เพิ่มหัวข้อรองสำเร็จเรียบร้อย!');
     }
 
     public function subupdate(Request $request, $id)
@@ -1171,7 +1152,7 @@ class AdminController extends Controller
         $request->validate([
             'mtopic_id' => ['required', 'exists:main_topics,id'],
             'name'      => ['required', 'string', 'max:255'],
-            'score'     => ['required', 'numeric'],
+            'score'     => ['required', 'numeric', 'min:0'],
         ]);
 
         $subTopic = SubTopic::findOrFail($id);
@@ -1183,9 +1164,8 @@ class AdminController extends Controller
         ]);
 
         return redirect()->route('admin.topic.subtopic.index')
-            ->with('success', 'Sub topic updated successfully!');
+            ->with('success', 'แก้ไขข้อมูลหัวข้อรองสำเร็จเรียบร้อย!');
     }
-
 
     public function subdelete($id)
     {
@@ -1193,7 +1173,7 @@ class AdminController extends Controller
         $subTopic->delete();
 
         return redirect()->route('admin.topic.subtopic.index')
-            ->with('success', 'Sub topic deleted successfully!');
+            ->with('success', 'ลบหัวข้อรองสำเร็จเรียบร้อย!');
     }
 
 
