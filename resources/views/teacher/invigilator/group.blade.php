@@ -1,130 +1,170 @@
 <x-app-layout>
-    <div class="mt-16 py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-50 dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h3 class="text-xl font-bold text-black-900 dark:text-white">รายการกลุ่มคณะกรรมการปีการศึกษา
-                        {{ $academicYear->year }}</h3>
+    <div class="p-6 max-w-7xl mx-auto mt-4">
 
-                    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-4">
-                        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                            <thead
-                                class="text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3">ID</th>
-                                    <th scope="col" class="px-6 py-3">ชื่อกลุ่ม</th>
-                                    <th scope="col" class="px-6 py-3">จำนวนกรรมการ</th>
-                                    {{-- <th scope="col" class="px-6 py-3">ปีการศึกษา</th> --}}
-                                    <th scope="col" class="px-6 py-3 text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($groupsWithMemberCount as $groups)
-                                    <tr
-                                        class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                        <td class="px-6 py-4">{{ $groups->id }}</td>
-                                        <td class="px-6 py-4">{{ $groups->name }}</td>
-                                        <td class="px-6 py-4">{{ $groups->memberCount }}</td>
-                                        {{-- <td class="px-6 py-4">{{ $groups->academic_year->year }}</td> --}}
-                                        <td class="px-6 py-4 text-center truncate">
-                                            {{-- <a href="{{ route('teacher.invigilator.member', ['id' => $groups->id]) }}"
-                                                class="text-blue-600 hover:text-blue-900">รายละเอียด</a> --}}
-                                            <button type="button" title="ดูรายละเอียด"
-                                                onclick="window.location.href='{{ route('teacher.invigilator.member', ['id' => $groups->id]) }}'"
-                                                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-                                                <i class="fa-solid fa-eye fa-lg"></i>
-                                            </button>
-                                            <button type="button" title="แก้ไข"
-                                                onclick="window.location.href='{{ route('teacher.invigilator.edit', ['id' => $groups->id]) }}'"
-                                                class="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-2.5 py-1.5 me-2 mb-2 dark:focus:ring-yellow-900">
-                                                <i class="fa-solid fa-pen fa-lg"></i>
-                                            </button>
-                                            {{-- <a href="{{ route('teacher.invigilator.edit', ['id' => $groups->id]) }}"
-                                                class="text-yellow-600 hover:text-yellow-900">แก้ไข</a> --}}
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200">
+                    Committee Groups
+                </h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 transition-colors duration-200">
+                    รายการกลุ่มคณะกรรมการประจำปีการศึกษา <span
+                        class="font-bold text-orange-500">{{ $academicYear->year }}</span>
+                </p>
+            </div>
 
-                                            <!-- ปุ่มลบ -->
-                                            <form action="{{ route('teacher.invigilator.delete', $groups->id) }}"
-                                                method="POST" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE') <!-- ใช้ DELETE Method -->
-                                                <button type="button"
-                                                    class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-2.5 py-1.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                                                    title="ลบ" onclick="confirmDelete(event, this)"
-                                                    data-name="{{ $groups->name }}">
-                                                    <i class="fa-solid fa-trash-can fa-lg"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td class="px-6 py-4 text-center" colspan="5">
-                                            No invigilator groups found.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="flex justify-end mt-4">
-                        <a href="{{ route('teacher.invigilator.home') }}"
-                            class="text-white bg-gray-600 hover:bg-gray-600 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-gray-700 dark:hover:bg-gray-600 dark:focus:ring-gray-800">
-                            กลับ
-                        </a>
-                    </div>
-                </div>
+            <div class="flex gap-2">
+                <a href="{{ route('teacher.invigilator.home') }}"
+                    class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors duration-200 flex items-center gap-2 text-sm font-medium">
+                    <i class="fa-solid fa-arrow-left"></i> ย้อนกลับ
+                </a>
+            </div>
+        </div>
+
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200 overflow-hidden">
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-600 dark:text-gray-400 transition-colors duration-200">
+                    <thead
+                        class="text-xs text-gray-500 uppercase bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700 transition-colors duration-200">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 font-semibold w-24 text-center">
+                                No.
+                            </th>
+                            <th scope="col" class="px-6 py-4 font-semibold">
+                                <i class="fa-solid fa-layer-group mr-1"></i> ชื่อกลุ่ม
+                            </th>
+                            <th scope="col" class="px-6 py-4 font-semibold text-center w-48">
+                                <i class="fa-solid fa-users mr-1"></i> จำนวนกรรมการ
+                            </th>
+                            <th scope="col" class="px-6 py-4 font-semibold text-center w-40">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 dark:divide-gray-700">
+                        @forelse ($groupsWithMemberCount as $groups)
+                            <tr
+                                class="hover:bg-orange-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200 group">
+
+                                <td class="px-6 py-5 text-center text-gray-500 dark:text-gray-400 font-medium">
+                                    {{ $loop->iteration }}
+                                </td>
+
+                                <td class="px-6 py-5">
+                                    <div
+                                        class="font-bold text-gray-900 dark:text-white text-base group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
+                                        {{ $groups->name }}
+                                    </div>
+                                    <div class="text-xs text-gray-400 mt-0.5">ID: {{ $groups->id }}</div>
+                                </td>
+
+                                <td class="px-6 py-5 text-center">
+                                    <span
+                                        class="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-600 border border-indigo-200 dark:bg-indigo-500/10 dark:border-indigo-500/20 dark:text-indigo-400">
+                                        {{ $groups->memberCount }} ท่าน
+                                    </span>
+                                </td>
+
+                                <td class="px-6 py-5 text-center space-x-2 text-gray-400 dark:text-gray-500">
+
+                                    <button type="button" title="ดูรายละเอียด"
+                                        onclick="window.location.href='{{ route('teacher.invigilator.member', ['id' => $groups->id]) }}'"
+                                        class="hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors p-1">
+                                        <i class="fa-solid fa-users-viewfinder"></i>
+                                    </button>
+
+                                    <button type="button" title="แก้ไข"
+                                        onclick="window.location.href='{{ route('teacher.invigilator.edit', ['id' => $groups->id]) }}'"
+                                        class="hover:text-blue-500 dark:hover:text-blue-400 transition-colors p-1">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+
+                                    <form action="{{ route('teacher.invigilator.delete', $groups->id) }}" method="POST"
+                                        class="delete-form inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" title="ลบ"
+                                            class="delete-button hover:text-red-500 dark:hover:text-red-400 transition-colors p-1"
+                                            data-topic="{{ $groups->name }}">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </form>
+
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td class="px-6 py-16 text-center text-gray-500 dark:text-gray-400" colspan="4">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <i
+                                            class="fa-solid fa-users-slash text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                                        <p class="text-base font-medium">ไม่พบข้อมูลกลุ่มคณะกรรมการในปีการศึกษานี้</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- แสดงการแจ้งเตือนด้วย SweetAlert2 ถ้า success -->
-    @if (session('success'))
+    @push('scripts')
         <script>
-            Swal.fire({
-                icon: 'success',
-                title: 'สำเร็จ!',
-                text: '{{ session('success') }}',
-                showConfirmButton: true,
-                timer: 3000
+            document.addEventListener("DOMContentLoaded", function() {
+
+                // ==========================================
+                // Script ของ SweetAlert
+                // ==========================================
+
+                // ตรวจสอบ success message
+                @if (session('success'))
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'สำเร็จ',
+                        text: "{{ session('success') }}",
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#f97316'
+                    });
+                @endif
+
+                // ตรวจสอบ validation errors
+                @if ($errors->any())
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: "{{ $errors->first() }}",
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#f97316'
+                    });
+                @endif
+
+                // SweetAlert2 สำหรับปุ่ม Delete
+                document.querySelectorAll('.delete-button').forEach(function(button) {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const form = this.closest('form');
+                        const topic = this.getAttribute('data-topic');
+
+                        Swal.fire({
+                            title: 'คุณต้องการลบกลุ่มนี้ใช่หรือไม่?',
+                            text: "ลบกลุ่ม: " + topic,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#f97316', // สีส้ม ตามธีม
+                            cancelButtonColor: '#9ca3af', // สีเทา
+                            confirmButtonText: 'ใช่, ลบเลย!',
+                            cancelButtonText: 'ยกเลิก'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                form.submit();
+                            }
+                        });
+                    });
+                });
+
             });
         </script>
-    @endif
-
-    <!-- แสดงการแจ้งเตือนด้วย SweetAlert2 ถ้า Error-->
-    @if ($errors->any())
-        <script>
-            Swal.fire({
-                icon: 'error',
-                title: 'มีข้อผิดพลาด!',
-                text: '{{ $errors->first() }}',
-                showConfirmButton: true,
-            });
-        </script>
-    @endif
-
-    <!-- SweetAlert2 Delete Confirmation -->
-    <script>
-        function confirmDelete(event, button) {
-            event.preventDefault(); // Prevent the default form submission
-
-            // ดึงชื่อกลุ่มจาก data-name
-            var groupName = button.getAttribute('data-name');
-
-            Swal.fire({
-                title: 'คุณแน่ใจหรือไม่ที่จะลบ?',
-                text: "เมื่อลบแล้วข้อมูลกลุ่ม " + groupName + ' จะหายไป',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'ใช่, ลบเลย!',
-                cancelButtonText: 'ยกเลิก',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // If confirmed, submit the form
-                    button.closest('form').submit();
-                }
-            });
-        }
-    </script>
+    @endpush
 </x-app-layout>

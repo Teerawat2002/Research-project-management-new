@@ -161,11 +161,28 @@ class TeacherController extends Controller
 
 
     // Proposal Setting
-    public function proposeProject()
+    public function proposeProject(Request $request)
     {
-        $group = ProjectGroup::with('academic_year')->get();
+        // สร้าง Query Builder ค้างไว้ พร้อมโหลด relations
+        $query = Propose::with(['advisor', 'project_group']);
 
-        return view('teacher.calendar.home', compact('calendarData'));
+        // รับค่า status
+        $status = $request->input('status');
+
+        // ตรวจสอบว่ามีการส่ง status มา และ ไม่เป็นค่าว่าง (รองรับ '0' ให้ทำงานได้)
+        // การใช้ isset หรือ !== null สำคัญมากเมื่อจัดการกับค่า '0'
+        if ($status !== null && $status !== '') {
+            // ใช้ whereHas เข้าไปเช็คใน Relation project_group (อิงจาก Model Propose)
+            $query->whereHas('project_group', function ($q) use ($status) {
+                // เช็คว่าสถานะใน project_groups ตรงกับที่ผู้ใช้เลือก
+                $q->where('status', $status);
+            });
+        }
+
+        // ดึงข้อมูลพร้อมการแบ่งหน้า และแนบ Query String กลับไป
+        $propose = $query->latest()->paginate(10)->withQueryString();
+
+        return view('teacher.propose.index', compact('propose'));
     }
 
 
