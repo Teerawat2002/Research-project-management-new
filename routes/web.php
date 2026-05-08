@@ -272,7 +272,7 @@ Route::middleware([AdvisorIsAdmin::class . ':advisor,teacher', 'auth:advisors'])
     // })->name('invigilator.Exam');
 
     Route::prefix('advisor/submission')->name('advisor.submission.')->group(function () {
-        Route::get('index', [AdvisorController::class, 'submissionIndex'])->name('index');
+        Route::get('index', [AdvisorController::class, 'submissionIndex'])->name('index')->defaults('title', 'จัดการข้อมูลการยื่นสอบโครงงาน');
         Route::get('submission/{id}', [AdvisorController::class, 'submission'])->name('submission');
         Route::get('download/{id}', [AdvisorController::class, 'downloadFile'])->name('download');
         Route::put('save/{id}', [AdvisorController::class, 'submissionSave'])->name('save');

@@ -1,321 +1,273 @@
 <x-app-layout>
-    <div class="mt-16 py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-50 dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-gray-300">การยื่นสอบ</h3>
+    <div class="p-6 max-w-7xl mx-auto mt-4">
 
-                    <div class="mt-4">
-                        <div
-                            class="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-between pb-4 mt-2">
-                            <!-- ฟอร์มค้นหา -->
-                            <form method="GET" action="{{ route('advisor.submission.index') }}" class="flex space-x-4">
-                                @csrf
-                                <input type="text" name="search" placeholder="ค้นหาด้วยชื่อโครงงาน"
-                                    class="px-4 py-2 border rounded-md w-80" value="{{ request('search') }}">
-
-                                <button type="submit"
-                                    class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                    ค้นหา
-                                </button>
-                            </form>
-                        </div>
-
-                        <div class="relative overflow-x-auto shadow-md sm:rounded-lg rounded-lg">
-                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                                <thead
-                                    class="text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                    <tr>
-                                        <th scope="col" class="px-6 py-3">
-                                            ลำดับ
-                                        </th>
-                                        {{-- <th scope="col" class="px-6 py-3">
-                                        ID
-                                    </th> --}}
-                                        <th scope="col" class="px-6 py-3 min-w-max whitespace-nowrap">
-                                            ชื่อโครงงาน
-                                        </th>
-                                        <th scope="col" class="px-6 py-3">
-                                            รายวิชา
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 text-center">
-                                            สถานะ
-                                        </th>
-                                        {{-- <th scope="col" class="px-6 py-3 text-center relative">
-                                            สถานะ
-                                            <button type="button" data-popover-target="popover-status-all"
-                                                data-popover-placement="bottom" data-popover-trigger="hover"
-                                                class="inline-flex items-center text-gray-600 hover:text-gray-800">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"
-                                                    fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd"
-                                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-9-3a1 1 0 112 0v1a1 1 0 11-2 0V7zm1 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"
-                                                        clip-rule="evenodd" />
-                                                </svg>
-                                            </button>
-
-                                            <div data-popover id="popover-status-all" role="tooltip"
-                                                class="absolute left-1/2 transform -translate-x-1/2 mt-2 z-10 invisible w-72 text-sm text-gray-500
-                                                     transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0
-                                                     dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400">
-                                                <div class="p-3 space-y-2">
-                                                    <h3 class="font-semibold text-gray-900 dark:text-white">รหัสสถานะ
-                                                    </h3>
-                                                    <ul class="list-disc list-inside space-y-1">
-                                                        <li><span class="font-medium">0:</span> อนุมัติสอบ /
-                                                            จัดตารางสอบแล้ว</li>
-                                                        <li><span class="font-medium">1:</span> รอการอนุมัติ</li>
-                                                        <li><span class="font-medium">2:</span> ยื่นสอบไม่ผ่าน</li>
-                                                        <li><span class="font-medium">3:</span> อนุมัติสอบ /
-                                                            รอจัดตารางสอบ</li>
-                                                        <li><span class="font-medium">(อื่นๆ):</span> ยังไม่ได้ยื่นสอบ
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <div data-popper-arrow></div>
-                                            </div>
-                                        </th> --}}
-
-                                        {{-- <th scope="col" class="px-6 py-3">
-                                        ปีการศึกษา
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        กลุ่มโครงการ
-                                    </th> --}}
-                                        <th scope="col" class="px-6 py-3 text-center">
-                                            Action
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($examSubmissions as $submission)
-                                        <tr
-                                            class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-
-                                            <th scope="row"
-                                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-gray-400">
-                                                {{ $loop->iteration + ($examSubmissions->currentPage() - 1) * $examSubmissions->perPage() }}
-                                            </th>
-                                            {{-- <td class="px-6 py-4">
-                                            {{ $submission->id }}
-                                        </td> --}}
-                                            <td class="px-6 py-4">
-                                                {{ $submission->propose->title }}
-                                            </td>
-                                            <td class="px-6 py-4">
-                                                {{ $submission->exam_type->name }}
-                                            </td>
-                                            {{-- <td class="px-6 py-4">
-                                            @if ($submission->status == 1)
-                                                ยังไม่ได้ยื่นสอบ
-                                            @elseif ($submission->status == 2)
-                                                รอการอนุมัติ
-                                            @elseif ($submission->status == 3)
-                                                ยื่นสอบไม่ผ่าน
-                                            @elseif ($submission->status == 0)
-                                                อนุมัติสอบ
-                                            @else
-                                                ยังไม่ได้ยื่นสอบ
-                                            @endif
-                                        </td> --}}
-                                            <td class="px-6 py-4 text-center max-w-xs truncate">
-                                                @switch($submission->status)
-                                                    @case(0)
-                                                        <span
-                                                            class="px-2 py-0.5 bg-green-200 text-green-800 rounded-md truncate">การสอบเสร็จสิ้น</span>
-                                                    @break
-
-                                                    @case(1)
-                                                        <span
-                                                            class="px-2 py-0.5 bg-yellow-200 text-yellow-800 rounded-md truncate">รอการอนุมัติ</span>
-                                                    @break
-
-                                                    @case(2)
-                                                        <span
-                                                            class="px-2 py-0.5 bg-red-200 text-red-800 rounded-md truncate">ยื่นสอบไม่ผ่าน</span>
-                                                    @break
-
-                                                    @case(3)
-                                                        <span
-                                                            class="px-2 py-0.5 bg-yellow-200 text-yellow-800 rounded-md truncate">รอจัดตารางสอบ</span>
-                                                    @break
-
-                                                    @case(4)
-                                                        <span
-                                                            class="px-2 py-0.5 bg-yellow-200 text-yellow-800 rounded-md truncate">กำลังดำเนินการสอบ</span>
-                                                    @break
-
-                                                    @default
-                                                        <span
-                                                            class="px-2 py-0.5 bg-gray-200 text-gray-800 rounded-md truncate">ยังไม่ได้ยื่นสอบ</span>
-                                                @endswitch
-                                            </td>
-                                            {{-- <td class="px-6 py-4">
-                                            {{ $propose->academic_year->year }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            {{ $propose->project_group->id ?? ''}}
-                                        </td> --}}
-                                            <td class="px-6 py-4 text-center truncate">
-                                                {{-- <a href="{{ route('teacher.invigilator.group', $groups->ac_id)}}" class="text-green-600 hover:text-yellow-900">การยื่นสอบ</a> --}}
-                                                @switch($submission->status)
-                                                    @case(0)
-                                                        {{-- การสอบเสร็จสิ้น --}}
-                                                        <button type="button" title="รายละเอียด"
-                                                            onclick="window.location.href='{{ route('advisor.submission.view', $submission->id) }}'"
-                                                            class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                            <i class="fa-solid fa-eye fa-lg"></i>
-                                                        </button>
-                                                        @if (strtolower($submission->exam_type->name ?? '') !== 'aucc')
-                                                            <button type="button" title="ประวัติ"
-                                                                onclick="window.location.href='{{ route('advisor.submission.history', $submission->id) }}'"
-                                                                class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                                <i class="fa-solid fa-clock-rotate-left fa-lg"></i>
-                                                            </button>
-                                                            <button type="button" title="ดูตารางสอบ"
-                                                                onclick="window.location.href='{{ route('advisor.schedule.show', $submission->id) }}'"
-                                                                class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                                <i class="fa-solid fa-calendar fa-lg"></i>
-                                                            </button>
-                                                        @endif
-                                                        <button type="button" title="ดูเกรด"
-                                                            onclick="window.location.href='{{ route('advisor.score.view', $submission->id) }}'"
-                                                            class="text-white bg-green-500 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800">
-                                                            <i class="fa-solid fa-graduation-cap fa-lg"></i>
-                                                        </button>
-                                                    @break
-
-                                                    @case(1)
-                                                        {{-- รอการอนุมัติ --}}
-                                                        @if (strtolower($submission->exam_type->name ?? '') == 'aucc')
-                                                            <button type="button" title="ให้คะแนน AUCC"
-                                                                onclick="window.location.href='{{ route('advisor.submission.auccForm', $submission->id) }}'"
-                                                                class="text-white bg-yellow-400 hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-yellow-500 dark:hover:bg-yellow-600 dark:focus:ring-yellow-800">
-                                                                <i class="fa-solid fa-pen-fancy fa-lg"></i>
-                                                            </button>
-                                                            <button type="button" title="ประวัติ"
-                                                                onclick="window.location.href='{{ route('advisor.submission.history', $submission->id) }}'"
-                                                                class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                                <i class="fa-solid fa-clock-rotate-left fa-lg"></i>
-                                                            </button>
-                                                        @else
-                                                            <button type="button" title="การอนุมัติ"
-                                                                onclick="window.location.href='{{ route('advisor.submission.submission', $submission->propose_id) }}'"
-                                                                class="text-white bg-yellow-400 hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-yellow-500 dark:hover:bg-yellow-600 dark:focus:ring-yellow-800">
-                                                                <i class="fa-solid fa-pen fa-lg"></i>
-                                                            </button>
-                                                            <button type="button" title="ประวัติ"
-                                                                onclick="window.location.href='{{ route('advisor.submission.history', $submission->id) }}'"
-                                                                class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                                <i class="fa-solid fa-clock-rotate-left fa-lg"></i>
-                                                            </button>
-                                                        @endif
-                                                    @break
-
-                                                    @case(2)
-                                                        {{-- ยื่นสอบไม่ผ่าน --}}
-                                                        <button type="button" title="รายละเอียด"
-                                                            onclick="window.location.href='{{ route('advisor.submission.view', $submission->id) }}'"
-                                                            class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                            <i class="fa-solid fa-eye fa-lg"></i>
-                                                        </button>
-                                                        <button type="button" title="ประวัติ"
-                                                            onclick="window.location.href='{{ route('advisor.submission.history', $submission->id) }}'"
-                                                            class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                            <i class="fa-solid fa-clock-rotate-left fa-lg"></i>
-                                                        </button>
-                                                    @break
-
-                                                    @case(3)
-                                                        {{-- อนุมัติสอบ --}}
-                                                        <button type="button" title="รายละเอียด"
-                                                            onclick="window.location.href='{{ route('advisor.submission.view', $submission->id) }}'"
-                                                            class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                            <i class="fa-solid fa-eye fa-lg"></i>
-                                                        </button>
-                                                        <button type="button" title="ประวัติ"
-                                                            onclick="window.location.href='{{ route('advisor.submission.history', $submission->id) }}'"
-                                                            class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                            <i class="fa-solid fa-clock-rotate-left fa-lg"></i>
-                                                        </button>
-                                                        <button type="button" title="จัดตารางสอบ"
-                                                            onclick="window.location.href='{{ route('advisor.schedule.create', $submission->id) }}'"
-                                                            class="text-white bg-yellow-400 hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-yellow-500 dark:hover:bg-yellow-600 dark:focus:ring-yellow-800">
-                                                            <i class="fa-solid fa-calendar-plus fa-lg"></i>
-                                                        </button>
-                                                    @break
-
-                                                    @case(4)
-                                                        {{-- ดำเนินการสอบ --}}
-                                                        <button type="button" title="รายละเอียด"
-                                                            onclick="window.location.href='{{ route('advisor.submission.view', $submission->id) }}'"
-                                                            class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                            <i class="fa-solid fa-eye fa-lg"></i>
-                                                        </button>
-                                                        <button type="button" title="ประวัติ"
-                                                            onclick="window.location.href='{{ route('advisor.submission.history', $submission->id) }}'"
-                                                            class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                            <i class="fa-solid fa-clock-rotate-left fa-lg"></i>
-                                                        </button>
-                                                        <button type="button" title="ดูตารางสอบ"
-                                                            onclick="window.location.href='{{ route('advisor.schedule.show', $submission->id) }}'"
-                                                            class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                            <i class="fa-solid fa-calendar fa-lg"></i>
-                                                        </button>
-                                                        <button type="button" title="ให้คะแนน"
-                                                            onclick="window.location.href='{{ route('advisor.score.score', $submission->id) }}'"
-                                                            class="text-white bg-yellow-400 hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-yellow-500 dark:hover:bg-yellow-600 dark:focus:ring-yellow-800">
-                                                            <i class="fa-solid fa-pen-fancy fa-lg"></i>
-                                                        </button>
-                                                    @break
-
-                                                    @default
-                                                        {{-- สถานะอื่นๆ (ยังไม่ได้ยื่น หรือ status นอกเหนือจากข้างต้น) --}}
-                                                @endswitch
-
-                                                {{-- <a href="{{ route('teacher.invigilator.edit', $groups->id) }}" class="text-blue-600 hover:text-blue-900">แก้ไข</a>
-                                            <a href="{{ route('teacher.invigilator.delete', $groups->id) }}" class="text-blue-600 hover:text-blue-900">ลบ</a> --}}
-                                            </td>
-                                        </tr>
-                                        @empty
-                                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                                                ไม่พบการยื่นสอบ
-                                            </td>
-                                        @endforelse
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            {{ $examSubmissions->links() }}
-                        </div>
-                    </div>
-                </div>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200">
+                    Exam Submissions
+                </h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 transition-colors duration-200">
+                    รายการยื่นสอบ การจัดตาราง และการประเมินผลโครงงาน
+                </p>
             </div>
         </div>
+
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200 overflow-hidden">
+
+            <div
+                class="p-5 border-b border-gray-50 dark:border-gray-700 bg-white dark:bg-gray-800 transition-colors duration-200">
+                <form method="GET" action="{{ route('advisor.submission.index') }}"
+                    class="flex flex-col sm:flex-row gap-3 w-full">
+                    @csrf
+                    <div class="relative w-full sm:w-96">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i class="fa-solid fa-magnifying-glass text-gray-400 dark:text-gray-500"></i>
+                        </div>
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-200 rounded-xl bg-gray-50 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 transition-colors duration-200"
+                            placeholder="ค้นหาด้วยชื่อโครงงาน...">
+                    </div>
+
+                    <button type="submit"
+                        class="px-5 py-2.5 text-sm font-medium text-white bg-orange-500 rounded-xl hover:bg-orange-600 shadow-sm transition-colors duration-200 shrink-0 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-search"></i> ค้นหา
+                    </button>
+                </form>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-600 dark:text-gray-400 transition-colors duration-200">
+                    <thead
+                        class="text-xs text-gray-500 uppercase bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700 transition-colors duration-200">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 font-semibold w-20 text-center">ลำดับ</th>
+                            <th scope="col" class="px-6 py-4 font-semibold min-w-[250px]">ชื่อโครงงาน</th>
+                            <th scope="col" class="px-6 py-4 font-semibold whitespace-nowrap">รายวิชา</th>
+                            <th scope="col" class="px-6 py-4 font-semibold text-center whitespace-nowrap">สถานะ</th>
+                            <th scope="col" class="px-6 py-4 font-semibold text-center w-40">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 dark:divide-gray-700">
+                        @forelse ($examSubmissions as $submission)
+                            <tr
+                                class="hover:bg-orange-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200 group">
+
+                                <td class="px-6 py-5 text-center text-gray-500 dark:text-gray-400 font-medium">
+                                    {{ $loop->iteration + ($examSubmissions->currentPage() - 1) * $examSubmissions->perPage() }}
+                                </td>
+
+                                <td class="px-6 py-5">
+                                    <div
+                                        class="font-bold text-gray-900 dark:text-white text-sm group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors line-clamp-2">
+                                        {{ $submission->propose->title ?? 'ไม่มีชื่อโครงงาน' }}
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-5 text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                                    <span
+                                        class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">
+                                        {{ $submission->exam_type->name ?? '-' }}
+                                    </span>
+                                </td>
+
+                                <td class="px-6 py-5 text-center">
+                                    @switch($submission->status)
+                                        @case(0)
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400 whitespace-nowrap">
+                                                <i class="fa-solid fa-circle-check mr-1.5"></i> การสอบเสร็จสิ้น
+                                            </span>
+                                        @break
+
+                                        @case(1)
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/20 dark:text-amber-400 whitespace-nowrap">
+                                                <i class="fa-solid fa-clock mr-1.5"></i> รอการอนุมัติ
+                                            </span>
+                                        @break
+
+                                        @case(2)
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/20 dark:text-rose-400 whitespace-nowrap">
+                                                <i class="fa-solid fa-circle-xmark mr-1.5"></i> ยื่นสอบไม่ผ่าน
+                                            </span>
+                                        @break
+
+                                        @case(3)
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-indigo-50 text-indigo-600 border border-indigo-200 dark:bg-indigo-500/10 dark:border-indigo-500/20 dark:text-indigo-400 whitespace-nowrap">
+                                                <i class="fa-solid fa-calendar-day mr-1.5"></i> รอจัดตารางสอบ
+                                            </span>
+                                        @break
+
+                                        @case(4)
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-purple-50 text-purple-600 border border-purple-200 dark:bg-purple-500/10 dark:border-purple-500/20 dark:text-purple-400 whitespace-nowrap">
+                                                <i class="fa-solid fa-spinner fa-spin mr-1.5"></i> กำลังดำเนินการสอบ
+                                            </span>
+                                        @break
+
+                                        @default
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 whitespace-nowrap">
+                                                ยังไม่ได้ยื่นสอบ
+                                            </span>
+                                    @endswitch
+                                </td>
+
+                                <td class="px-6 py-5 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+
+                                        @switch($submission->status)
+                                            @case(0)
+                                                {{-- การสอบเสร็จสิ้น --}}
+                                                <button type="button" title="รายละเอียด"
+                                                    onclick="window.location.href='{{ route('advisor.submission.view', $submission->id) }}'"
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-blue-400 transition-colors">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </button>
+
+                                                @if (strtolower($submission->exam_type->name ?? '') !== 'aucc')
+                                                    <button type="button" title="ประวัติ"
+                                                        onclick="window.location.href='{{ route('advisor.submission.history', $submission->id) }}'"
+                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-gray-200 hover:text-gray-700 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200 transition-colors">
+                                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                                    </button>
+                                                    <button type="button" title="ดูตารางสอบ"
+                                                        onclick="window.location.href='{{ route('advisor.schedule.show', $submission->id) }}'"
+                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-cyan-50 hover:text-cyan-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-cyan-400 transition-colors">
+                                                        <i class="fa-solid fa-calendar"></i>
+                                                    </button>
+                                                @endif
+
+                                                <button type="button" title="ดูเกรด / ให้คะแนน"
+                                                    onclick="window.location.href='{{ route('advisor.score.view', $submission->id) }}'"
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-emerald-400 transition-colors">
+                                                    <i class="fa-solid fa-graduation-cap"></i>
+                                                </button>
+                                            @break
+
+                                            @case(1)
+                                                {{-- รอการอนุมัติ --}}
+                                                @if (strtolower($submission->exam_type->name ?? '') == 'aucc')
+                                                    <button type="button" title="ให้คะแนน AUCC"
+                                                        onclick="window.location.href='{{ route('advisor.submission.auccForm', $submission->id) }}'"
+                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-amber-50 hover:text-amber-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-amber-400 transition-colors">
+                                                        <i class="fa-solid fa-pen-fancy"></i>
+                                                    </button>
+                                                    <button type="button" title="ประวัติ"
+                                                        onclick="window.location.href='{{ route('advisor.submission.history', $submission->id) }}'"
+                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-blue-400 transition-colors">
+                                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                                    </button>
+                                                @else
+                                                    <button type="button" title="การอนุมัติ"
+                                                        onclick="window.location.href='{{ route('advisor.submission.submission', $submission->propose_id) }}'"
+                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-orange-50 hover:text-orange-500 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-orange-400 transition-colors">
+                                                        <i class="fa-solid fa-clipboard-check"></i>
+                                                    </button>
+                                                    <button type="button" title="ประวัติ"
+                                                        onclick="window.location.href='{{ route('advisor.submission.history', $submission->id) }}'"
+                                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-blue-400 transition-colors">
+                                                        <i class="fa-solid fa-clock-rotate-left"></i>
+                                                    </button>
+                                                @endif
+                                            @break
+
+                                            @case(2)
+                                            @case(4)
+                                                {{-- ยื่นสอบไม่ผ่าน หรือ กำลังดำเนินการสอบ --}}
+                                                <button type="button" title="รายละเอียด"
+                                                    onclick="window.location.href='{{ route('advisor.submission.view', $submission->id) }}'"
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-blue-400 transition-colors">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </button>
+                                                <button type="button" title="ดูตารางสอบ"
+                                                    onclick="window.location.href='{{ route('advisor.schedule.show', $submission->id) }}'"
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-cyan-50 hover:text-cyan-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-cyan-400 transition-colors">
+                                                    <i class="fa-solid fa-calendar"></i>
+                                                </button>
+                                                <button type="button" title="ประวัติ"
+                                                    onclick="window.location.href='{{ route('advisor.submission.history', $submission->id) }}'"
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-gray-200 hover:text-gray-700 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200 transition-colors">
+                                                    <i class="fa-solid fa-clock-rotate-left"></i>
+                                                </button>
+                                            @break
+
+                                            @case(3)
+                                                {{-- รอจัดตารางสอบ --}}
+                                                <button type="button" title="รายละเอียด"
+                                                    onclick="window.location.href='{{ route('advisor.submission.view', $submission->id) }}'"
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-blue-400 transition-colors">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </button>
+                                                <button type="button" title="ประวัติ"
+                                                    onclick="window.location.href='{{ route('advisor.submission.history', $submission->id) }}'"
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-gray-200 hover:text-gray-700 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200 transition-colors">
+                                                    <i class="fa-solid fa-clock-rotate-left"></i>
+                                                </button>
+                                                <button type="button" title="จัดตารางสอบ"
+                                                    onclick="window.location.href='{{ route('advisor.schedule.create', $submission->id) }}'"
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-indigo-50 hover:text-indigo-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-indigo-400 transition-colors">
+                                                    <i class="fa-solid fa-calendar-plus"></i>
+                                                </button>
+                                            @break
+                                        @endswitch
+
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-6 py-16 text-center text-gray-500 dark:text-gray-400">
+                                        <div class="flex flex-col items-center justify-center">
+                                            <i
+                                                class="fa-solid fa-folder-open text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                                            <p class="text-base font-medium">ไม่พบการยื่นสอบ</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                @if ($examSubmissions->hasPages())
+                    <div
+                        class="p-4 border-t border-gray-100 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 transition-colors duration-200 rounded-b-xl">
+                        {{ $examSubmissions->links() }}
+                    </div>
+                @endif
+
+            </div>
+        </div>
+
+        @push('scripts')
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    // ตรวจสอบ success message
+                    @if (session('success'))
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'สำเร็จ',
+                            text: "{{ session('success') }}",
+                            confirmButtonText: 'ตกลง',
+                            confirmButtonColor: '#f97316'
+                        });
+                    @endif
+
+                    // ตรวจสอบ validation errors (แสดงข้อความแรก)
+                    @if ($errors->any())
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด',
+                            text: "{{ $errors->first() }}",
+                            confirmButtonText: 'ตกลง',
+                            confirmButtonColor: '#f97316'
+                        });
+                    @endif
+                });
+            </script>
+        @endpush
     </x-app-layout>
-
-    <script>
-        // ตรวจสอบ success message
-        @if (session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'สำเร็จ',
-                // timmer: 2000,
-                text: "{{ session('success') }}",
-                confirmButtonText: 'ตกลง'
-            });
-        @endif
-
-        // ตรวจสอบ validation errors (แสดงข้อความแรก)
-        @if ($errors->any())
-            Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                // timmer: 2000,
-                text: "{{ $errors->first() }}",
-                confirmButtonText: 'ตกลง'
-            });
-        @endif
-    </script>

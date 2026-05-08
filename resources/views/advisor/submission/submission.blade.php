@@ -1,170 +1,192 @@
 <x-app-layout>
-    <div class="mt-16 py-8">
-        <div class="max-w-4xl mx-auto py-8">
-            <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                    การอนุมัติยื่นสอบโครงงาน
-                </h2>
+    <div class="p-6 max-w-7xl mx-auto mt-4">
 
-                @if (session('success'))
-                    <div
-                        class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-100 dark:bg-green-800 dark:text-green-200">
-                        {{ session('success') }}
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <h1
+                    class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-file-signature text-orange-500"></i> พิจารณาการยื่นสอบโครงงาน
+                </h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    ตรวจสอบความถูกต้องของไฟล์และรายละเอียดก่อนดำเนินการอนุมัติสอบ
+                </p>
+            </div>
+            <a href="{{ route('advisor.submission.index') }}"
+                class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 text-sm font-medium">
+                <i class="fa-solid fa-arrow-left"></i> ย้อนกลับ
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <div class="lg:col-span-2 space-y-6">
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 lg:p-8">
+
+                    <div class="mb-8 pb-6 border-b border-gray-100 dark:border-gray-700">
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            <span
+                                class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30 uppercase">
+                                {{ $propose->project_type->name }}
+                            </span>
+                            <span
+                                class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400 border border-orange-200 dark:border-orange-500/30 uppercase">
+                                ครั้งที่สอบ: {{ $submission->attempt }}
+                            </span>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white leading-tight">
+                            {{ $propose->title }}
+                        </h2>
                     </div>
-                @endif
 
-                <!-- ชื่อโครงงาน -->
-                <div class="mb-4">
-                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">ชื่อโครงงาน</h4>
-                    <p class="mt-1 text-gray-900 dark:text-white">{{ $propose->title }}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3
+                                class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-users text-orange-500"></i> สมาชิกกลุ่มโครงงาน
+                            </h3>
+                            <ul class="space-y-3">
+                                @foreach ($members as $member)
+                                    <li class="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                                        <div
+                                            class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 shrink-0">
+                                            <i class="fa-solid fa-user text-xs"></i>
+                                        </div>
+                                        <span class="font-medium">{{ $member->student->s_fname }}
+                                            {{ $member->student->s_lname }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h3
+                                class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <i class="fa-solid fa-file-pdf text-red-500"></i> เอกสารประกอบการยื่นสอบ
+                            </h3>                            
+                            <div
+                                class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 flex items-center justify-between group hover:border-orange-200 dark:hover:border-orange-500/30 transition-all">
+                                <div class="flex items-center gap-3">
+                                    <img src="{{ asset('icons/pdf.png') }}" class="w-10 h-10 object-contain"
+                                        alt="PDF">
+                                    <div>
+                                        <p class="text-sm font-bold text-gray-800 dark:text-white line-clamp-1">
+                                            เอกสารโครงงาน.pdf</p>
+                                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">PDF DOCUMENT
+                                        </p>
+                                    </div>
+                                </div>
+                                <a href="{{ route('student.submission.download', ['id' => $submission->id]) }}"
+                                    class="p-2.5 bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 rounded-xl shadow-sm hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors border border-gray-100 dark:border-gray-600 flex items-center gap-2 text-xs font-bold">
+                                    <i class="fa-solid fa-download"></i> ดาวน์โหลด
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
+            </div>
 
-                <!-- สมาชิกกลุ่ม -->
-                <div class="mb-4">
-                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">สมาชิกกลุ่มโครงงาน</h4>
-                    <ul class="list-disc ml-5 mt-2">
-                        @foreach ($members as $member)
-                            <li class="text-gray-900 dark:text-white">
-                                {{ $member->student->s_fname }} {{ $member->student->s_lname }}
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
+            <div class="space-y-6">
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-orange-200 dark:border-orange-500/30 p-6 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-orange-400 to-red-500"></div>
 
-                <!-- ประเภทโครงงาน -->
-                <div class="mb-4">
-                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">ประเภทโครงงาน</h4>
-                    <p class="mt-1 text-gray-900 dark:text-white">{{ $propose->project_type->name }}</p>
-                </div>
+                    <h3
+                        class="text-sm font-bold text-gray-800 dark:text-white uppercase tracking-wider mb-5 mt-2 flex items-center gap-2">
+                        <i class="fa-solid fa-gavel text-gray-400"></i> ผลการตรวจสอบ
+                    </h3>
 
-                <!-- ครั้งที่ส่งสอบ -->
-                <div class="mb-4">
-                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">ครั้งที่สอบ</h4>
-                    <p class="mt-1 text-gray-900 dark:text-white">{{ $submission->attempt }}</p>
-                </div>
+                    <form method="POST" action="{{ route('advisor.submission.save', ['id' => $submission->id]) }}">
+                        @csrf
+                        @method('PUT')
 
-                <!-- ไฟล์โครงงาน -->
-                <div class="mb-6">
-                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">ไฟล์โครงงาน</h4>
-                    <a href="{{ route('advisor.submission.download', ['id' => $submission->first()?->id]) }}"
-                        class="text-blue-600 hover:underline" download>
-                        <img src="{{ asset('icons/pdf.png') }}" alt="PDF" width="48" height="48">
-                    </a>
-                </div>
-
-                {{-- <div class="mb-6">
-                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">ไฟล์</h4>
-                    <a href="{{ route('advisor.submission.download', ['id' => $examsubmission->first()?->id]) }}"
-                        class="text-blue-600 hover:underline" download>
-                        <img src="{{ asset('icons/pdf.png') }}" alt="PDF Icon" width="50" height="50">
-                    </a>
-                </div> --}}
-
-                <!-- แบบฟอร์มอนุมัติ/ไม่อนุมัติ -->
-                <form method="POST" action="{{ route('advisor.submission.save', ['id' => $submission->id]) }}"
-                    class="mt-8 space-y-6">
-                    @csrf
-                    @method('PUT')
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            ผลการตรวจสอบ
-                        </label>
-                        <div class="flex items-center space-x-6 mt-2">
-                            <label class="inline-flex items-center">
-                                <input type="radio" name="approval" value="approved"
-                                    class="text-green-500 focus:ring-green-500"
+                        <div class="flex flex-col gap-3 mb-6">
+                            <label
+                                class="relative flex items-center p-4 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-emerald-50 dark:hover:bg-emerald-500/5 transition-all group has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 dark:has-[:checked]:bg-emerald-500/10">
+                                <input name="approval" type="radio" value="approved" id="approved"
+                                    class="w-4 h-4 text-emerald-600 bg-white border-gray-300 focus:ring-emerald-500"
                                     {{ old('approval', $submission->status === 0 ? 'approved' : '') === 'approved' ? 'checked' : '' }}>
-                                <span class="ml-2 text-gray-900 dark:text-white">อนุมัติ</span>
+                                <span
+                                    class="ml-3 text-sm font-bold text-gray-700 dark:text-gray-200 group-hover:text-emerald-700 dark:group-hover:text-emerald-400">อนุมัติการยื่นสอบ</span>
                             </label>
-                            <label class="inline-flex items-center">
-                                <input type="radio" name="approval" value="rejected"
-                                    class="text-red-500 focus:ring-red-500"
+
+                            <label
+                                class="relative flex items-center p-4 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-500/5 transition-all group has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50 dark:has-[:checked]:bg-rose-50/10">
+                                <input name="approval" type="radio" value="rejected" id="rejected"
+                                    class="w-4 h-4 text-rose-600 bg-white border-gray-300 focus:ring-rose-500"
                                     {{ old('approval', $submission->status === 2 ? 'rejected' : '') === 'rejected' ? 'checked' : '' }}>
-                                <span class="ml-2 text-gray-900 dark:text-white">ไม่อนุมัติ</span>
+                                <span
+                                    class="ml-3 text-sm font-bold text-gray-700 dark:text-gray-200 group-hover:text-rose-700 dark:group-hover:text-rose-400">ไม่อนุมัติ
+                                    (ส่งแก้ไข)</span>
                             </label>
                         </div>
                         @error('approval')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-rose-500 text-xs mb-4">{{ $message }}</p>
                         @enderror
-                    </div>
 
-                    <!-- textarea แสดงเฉพาะกรณีไม่อนุมัติ -->
-                    <div id="reason-wrapper"
-                        class="{{ old('approval', $submission->status === 2 ? 'rejected' : '') === 'rejected' ? '' : 'hidden' }}">
-                        <label for="reason" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            เหตุผลการไม่อนุมัติ
-                        </label>
-                        <textarea name="reason" id="reason" rows="4"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500
-                               dark:bg-gray-700 dark:text-white dark:border-gray-600"></textarea>
-                        @error('reason')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
+                        <div id="reason-wrapper"
+                            class="mb-6 animate-fade-in-up {{ old('approval', $submission->status === 2 ? 'rejected' : '') === 'rejected' ? '' : 'hidden' }}">
+                            <label for="reason"
+                                class="block text-[11px] font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">
+                                เหตุผลการไม่อนุมัติ / สิ่งที่ต้องแก้ไข <span class="text-rose-500">*</span>
+                            </label>
+                            <textarea name="reason" id="reason" rows="4" placeholder="ระบุสิ่งที่นักศึกษาต้องปรับปรุง..."
+                                class="block w-full px-4 py-3 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-xl focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-500 dark:text-white transition-colors custom-scrollbar">{{ old('reason', $submission->reason) }}</textarea>
+                            @error('reason')
+                                <p class="text-rose-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-                    <div class="flex justify-end space-x-4">
-                        <button type="submit"
-                            class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600">
-                            บันทึก
-                        </button>
-                        <button type="button" onclick="window.location.href='{{ route('advisor.submission.index') }}'"
-                            class="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-md focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-red-500 dark:hover:bg-red-600">
-                            ยกเลิก
-                        </button>
-                    </div>
-                </form>
+                        <div class="flex flex-col gap-3">
+                            <button type="submit"
+                                class="w-full px-5 py-3 text-sm font-bold text-white bg-orange-500 rounded-xl hover:bg-orange-600 shadow-md shadow-orange-500/20 flex items-center justify-center gap-2 transition-colors">
+                                <i class="fa-solid fa-save"></i> บันทึกผลการตรวจสอบ
+                            </button>
+                            <button type="button"
+                                onclick="window.location.href='{{ route('advisor.submission.index') }}'"
+                                class="w-full px-5 py-3 text-sm font-bold text-gray-500 hover:text-gray-700 transition-colors">
+                                ยกเลิก
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
             </div>
+
         </div>
     </div>
 
-    <script>
-        // Toggle textarea เมื่อเลือก “ไม่อนุมัติ”
-        document.addEventListener('DOMContentLoaded', () => {
-            const approved = document.querySelector('input[value="approved"]');
-            const rejected = document.querySelector('input[value="rejected"]');
-            const wrapper = document.getElementById('reason-wrapper');
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const approved = document.querySelector('input[value="approved"]');
+                const rejected = document.querySelector('input[value="rejected"]');
+                const wrapper = document.getElementById('reason-wrapper');
 
-            approved.addEventListener('change', () => wrapper.classList.add('hidden'));
-            rejected.addEventListener('change', () => wrapper.classList.remove('hidden'));
-        });
-    </script>
+                // Toggle visibility
+                approved.addEventListener('change', () => wrapper.classList.add('hidden'));
+                rejected.addEventListener('change', () => wrapper.classList.remove('hidden'));
 
-    <!-- Auto Resize Textarea Script -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const textarea = document.getElementById('tools');
-            // Adjust the height of the textarea based on its content
-            textarea.style.height = "auto"; // Reset height
-            textarea.style.height = (textarea.scrollHeight) + "px"; // Set height to fit content
+                // SweetAlert
+                @if (session('success'))
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'สำเร็จ',
+                        text: "{{ session('success') }}",
+                        confirmButtonColor: '#f97316'
+                    });
+                @endif
 
-            // Optional: Resize on input (if the field were editable)
-            textarea.addEventListener('input', function() {
-                textarea.style.height = "auto";
-                textarea.style.height = (textarea.scrollHeight) + "px";
+                @if (session('error'))
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: {!! json_encode(session('error')) !!},
+                        confirmButtonColor: '#f97316'
+                    });
+                @endif
             });
-        });
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            @if (session('error'))
-                Swal.fire({
-                    icon: 'error',
-                    title: 'เกิดข้อผิดพลาด',
-                    text: {!! json_encode(session('error')) !!}
-                });
-            @endif
-
-            @if ($errors->any())
-                const laravelErrors = {!! json_encode($errors->all()) !!};
-                Swal.fire({
-                    icon: 'error',
-                    title: 'พบข้อผิดพลาด',
-                    timer: 3000,
-                    html: laravelErrors.map(e => `<div class="text-center">${e}</div>`).join('')
-                });
-            @endif
-        });
-    </script>
+        </script>
+    @endpush
 </x-app-layout>
