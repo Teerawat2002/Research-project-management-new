@@ -44,29 +44,35 @@ class AdvisorController extends Controller
     // Proposal setting
     public function proposeIndex(Request $request)
     {
-        $user = Auth::user(); // ดึงข้อมูลผู้ที่ล็อกอิน
-        $advisorId = $user->id; // ดึง id ของผู้ใช้งาน (ซึ่งเป็น Advisor)
+        $user = Auth::user();
+        $advisorId = $user->id;
 
-        // ดึง proposals ที่เกี่ยวข้องกับ a_id ของผู้ใช้งาน
-        $proposals = Propose::with('advisor') // โหลดความสัมพันธ์ advisor
-            ->where('a_id', $advisorId) // กรองเฉพาะ a_id ที่ตรงกับ id ของผู้ใช้งาน
-            ->orderBy('created_at', 'desc'); // เรียงตาม id จากน้อยไปมาก
+        // เริ่มต้น Query
+        $query = Propose::with('advisor')
+            ->where('a_id', $advisorId)
+            ->orderBy('created_at', 'desc');
 
-        // ถ้ามีการค้นหาจากฟอร์มค้นหา
-        if ($request->has('search')) {
-            $proposals->where('title', 'like', '%' . $request->search . '%'); // ค้นหาจากชื่อ title
+        // 1. ถ้ามีการค้นหาจากชื่อ
+        if ($request->has('search') && $request->search !== '') {
+            $query->where('title', 'like', '%' . $request->search . '%');
         }
 
-        // ดึงข้อมูล proposal ที่กรองแล้ว
-        $proposals = $proposals->paginate(10);
+        // 2. ถ้ามีการเลือก "สถานะ" จาก Dropdown
+        $status = $request->input('status');
 
-        // ตรวจสอบว่ามี proposal ที่ status เป็น 1 หรือ 2 หรือไม่
+        // เช็คว่าค่าต้องไม่เป็น null และ ไม่เป็นค่าว่าง (วิธีนี้รองรับค่า '0' ด้วย)
+        if ($status !== null && $status !== '') {
+            $query->where('status', $status);
+        }
+
+        // 3. ดึงข้อมูลที่กรองแล้ว
+        $proposals = $query->paginate(10)->withQueryString();
+
+        // 4. เช็ค Active Proposal สำหรับการใช้งานอื่นๆ
         $hasActiveProposal = Propose::where('a_id', $advisorId)
-            ->whereIn('status', [1, 2]) // ตรวจสอบ status 1 (Waiting for approval) หรือ 2 (Rejected)
+            ->whereIn('status', [1, 2])
             ->exists();
 
-        // dd($proposals->toArray());
-        // ส่งข้อมูลไปยัง View
         return view('advisor.propose.index', compact('proposals', 'hasActiveProposal'));
     }
 

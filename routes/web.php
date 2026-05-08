@@ -259,7 +259,7 @@ Route::get('/excel/{filename}', function ($filename) {
 // Route::middleware(['auth:advisors'])->group(function () {
 Route::middleware([AdvisorIsAdmin::class . ':advisor,teacher', 'auth:advisors'])->group(function () {
     Route::prefix('advisor/propose')->name('advisor.propose.')->group(function () {
-        Route::get('index', [AdvisorController::class, 'proposeIndex'])->name('index');
+        Route::get('index', [AdvisorController::class, 'proposeIndex'])->name('index')->defaults('title', 'จัดการข้อมูลหัวข้อโครงงาน');
         Route::get('approve/{id}', [AdvisorController::class, 'approveFormView'])->name('approveFormView');
         Route::get('view/{id}', [AdvisorController::class, 'approveView'])->name('approveView');
         Route::put('{id}', [AdvisorController::class, 'approve'])->name('approve');

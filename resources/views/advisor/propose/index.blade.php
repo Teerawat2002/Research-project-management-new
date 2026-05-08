@@ -1,186 +1,231 @@
 <x-app-layout>
-    <div class="mt-16 py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-50 dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-gray-300">เสนอหัวข้อโครงงาน</h3>
+    <div class="p-6 max-w-7xl mx-auto mt-4">
 
-                    <!-- ฟอร์มค้นหา -->
-                    <div class="flex justify-between items-center mb-4 mt-4">
-                        <form method="GET" action="{{ route('advisor.propose.index') }}" class="flex space-x-4">
-                            @csrf
-                            <input type="text" name="search" placeholder="ค้นหาด้วยชื่อเรื่อง"
-                                class="px-4 py-2 border rounded-md w-80" value="{{ request('search') }}">
-
-                            <button type="submit"
-                                class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                ค้นหา
-                            </button>
-                        </form>
-                    </div>
-
-                    <div class="relative overflow-x-auto shadow-md sm:rounded-lg rounded-lg mt-2">
-                        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                            <thead
-                                class="text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3">ลำดับ</th>
-                                    <th scope="col" class="px-6 py-3 truncate">ชื่อโครงงาน</th>
-                                    {{-- <th scope="col" class="px-6 py-3">กลุ่ม</th> --}}
-                                    {{-- <th scope="col" class="px-6 py-3">อาจารย์ที่ปรึกษา</th> --}}
-                                    <th scope="col" class="px-6 py-3 text-center">สถานะ</th>
-                                    <th scope="col" class="px-6 py-3">วันที่เสนอ</th>
-                                    <th scope="col" class="px-6 py-3">วันที่อนุมัติ</th>
-                                    <th scope="col" class="px-6 py-3 text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($proposals as $proposal)
-                                    <tr
-                                        class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                                        <td class="px-6 py-4">
-                                            {{ $loop->iteration + ($proposals->currentPage() - 1) * $proposals->perPage() }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            {{ $proposal->title }}
-                                        </td>
-                                        {{-- <td class="px-6 py-4">
-                                            {{ $proposal->group_id }}
-                                        </td> --}}
-                                        {{-- <td class="px-6 py-4">
-                                            {{ $proposal->advisor->name ?? 'N/A' }}
-                                        </td> --}}
-                                        <td class="px-6 py-4 text-center max-w-xs truncate">
-                                            @switch($proposal->status)
-                                                @case(0)
-                                                    <span
-                                                        class="px-2 py-0.5 bg-green-200 text-green-800 rounded-md truncate">เสร็จสิ้น</span>
-                                                @break
-
-                                                @case(1)
-                                                    <span
-                                                        class="px-2 py-0.5 bg-yellow-200 text-yellow-800 rounded-md truncate">รอการอนุมัติ</span>
-                                                @break
-
-                                                @case(2)
-                                                    <span
-                                                        class="px-2 py-0.5 bg-red-200 text-red-800 rounded-md truncate">ถูกปฏิเสธ</span>
-                                                @break
-
-                                                @default
-                                                    <span
-                                                        class="px-2 py-0.5 bg-gray-200 text-gray-800 rounded-md truncate">สถานะไม่รู้จัก</span>
-                                            @endswitch
-                                        </td>
-                                        <td class="px-6 py-4">{{ $proposal->created_at->format('d/m/Y') }}</td>
-                                        <td class="px-6 py-4">{{ $proposal->updated_at->format('d/m/Y') }}</td>
-                                        {{-- <td class="px-6 py-4 text-center max-w-xs truncate">
-                                            @if ($proposal->status == 1)
-                                                <!-- แสดงลิงก์ "อนุมัติ" หากสถานะเป็น 1 -->
-                                                <a href="{{ route('advisor.propose.approveFormView', $proposal->id) }}"
-                                                    class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                                                    อนุมัติ
-                                                </a>
-                                                <a href="{{ route('advisor.propose.history', $proposal->id) }}"
-                                                    class="font-medium text-grey-600 dark:text-grey-500 hover:underline">
-                                                    ประวัติ
-                                                </a>
-                                            @elseif ($proposal->status == 2)
-                                                <a href="{{ route('advisor.propose.history', $proposal->id) }}"
-                                                    class="font-medium text-grey-600 dark:text-grey-500 hover:underline">
-                                                    ประวัติ
-                                                </a>
-                                            @else
-                                                <!-- แสดงลิงก์ "ดู" หากสถานะเป็น 0 หรือ 2 -->
-                                                <a href="{{ route('advisor.propose.approveView', $proposal->id) }}"
-                                                    class="font-medium text-green-600 dark:text-green-500 hover:underline">
-                                                    ดู
-                                                </a>
-                                                <a href="{{ route('advisor.propose.history', $proposal->id) }}"
-                                                    class="font-medium text-grey-600 dark:text-grey-500 hover:underline">
-                                                    ประวัติ
-                                                </a>
-                                            @endif
-                                        </td> --}}
-
-                                        <td class="px-6 py-4 text-center max-w-xs truncate">
-                                            @if ($proposal->status == 1)
-                                                <!-- แสดงลิงก์ "อนุมัติ" หากสถานะเป็น 1 -->
-                                                <button type="button" title="แก้ไข"
-                                                    onclick="window.location.href='{{ route('advisor.propose.approveFormView', $proposal->id) }}'"
-                                                    class="text-white bg-yellow-400 hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-yellow-500 dark:hover:bg-yellow-600 dark:focus:ring-yellow-800">
-                                                    <i class="fa-solid fa-pen fa-lg"></i>
-                                                </button>
-                                                <button type="button" title="ประวัติ"
-                                                    onclick="window.location.href='{{ route('advisor.propose.history', $proposal->id) }}'"
-                                                    class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                    <i class="fa-solid fa-clock-rotate-left fa-lg"></i>
-                                                </button>
-                                            @elseif ($proposal->status == 2)
-                                                <button type="button" title="รายละเอียด"
-                                                    onclick="window.location.href='{{ route('advisor.propose.approveView', $proposal->id) }}'"
-                                                    class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                    <i class="fa-solid fa-eye fa-lg"></i>
-                                                </button>
-                                                <button type="button" title="ประวัติ"
-                                                    onclick="window.location.href='{{ route('advisor.propose.history', $proposal->id) }}'"
-                                                    class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                    <i class="fa-solid fa-clock-rotate-left fa-lg"></i>
-                                                </button>
-                                            @else
-                                                <button type="button" title="รายละเอียด"
-                                                    onclick="window.location.href='{{ route('advisor.propose.approveView', $proposal->id) }}'"
-                                                    class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                    <i class="fa-solid fa-eye fa-lg"></i>
-                                                </button>
-                                                <button type="button" title="ประวัติ"
-                                                    onclick="window.location.href='{{ route('advisor.propose.history', $proposal->id) }}'"
-                                                    class="text-white bg-blue-500 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-2.5 py-1.5 dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                                    <i class="fa-solid fa-clock-rotate-left fa-lg"></i>
-                                                </button>
-                                            @endif
-
-                                        </td>
-                                    </tr>
-                                    @empty
-                                        <tr>
-                                            <td class="px-6 py-4 text-center" colspan="6">
-                                                ไม่พบข้อเสนอการศึกษา
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="mt-4">
-                            {{ $proposals->links() }}
-                        </div>
-                    </div>
-                </div>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200">
+                    Project Proposals
+                </h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 transition-colors duration-200">
+                    รายการเสนอหัวข้อโครงงานที่รอการพิจารณา
+                </p>
             </div>
         </div>
 
-        <script>
-            // ตรวจสอบ success message
-            @if (session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: 'สำเร็จ',
-                    // timmer: 2000,
-                    text: "{{ session('success') }}",
-                    confirmButtonText: 'ตกลง'
-                });
-            @endif
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200">
 
-            // ตรวจสอบ validation errors (แสดงข้อความแรก)
-            @if ($errors->any())
-                Swal.fire({
-                    icon: 'error',
-                    title: 'เกิดข้อผิดพลาด',
-                    // timmer: 2000,
-                    text: "{{ $errors->first() }}",
-                    confirmButtonText: 'ตกลง'
+            <div
+                class="p-5 border-b border-gray-50 dark:border-gray-700 bg-white dark:bg-gray-800 transition-colors duration-200">
+                <form method="GET" action="{{ route('advisor.propose.index') }}" id="filterForm"
+                    class="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
+                    @csrf
+                    <input type="hidden" name="status" id="hidden_status" value="{{ request('status') }}">
+
+                    <div class="flex gap-2 w-full md:max-w-md">
+                        <div class="relative w-full">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <i class="fa-solid fa-magnifying-glass text-gray-400 dark:text-gray-500"></i>
+                            </div>
+                            <input type="text" name="search" value="{{ request('search') }}"
+                                class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-200 rounded-xl bg-gray-50 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 transition-colors duration-200"
+                                placeholder="ค้นหาชื่อโครงงาน...">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <label class="text-sm font-semibold text-gray-700 dark:text-gray-300 shrink-0 hidden sm:block">
+                            <i class="fa-solid fa-filter mr-1 text-orange-500"></i> สถานะ:
+                        </label>
+
+                        @php
+                            // รายการสถานะทั้งหมด
+                            $statusList = [
+                                '0' => 'เสร็จสิ้น (อนุมัติแล้ว)',
+                                '1' => 'รอการพิจารณา',
+                                '2' => 'ถูกปฏิเสธ',
+                            ];
+                            $currentStatus = request('status');
+                            $selectedStatusName =
+                                $currentStatus !== null && $currentStatus !== ''
+                                    ? $statusList[$currentStatus] ?? 'สถานะทั้งหมด'
+                                    : 'สถานะทั้งหมด';
+                        @endphp
+
+                        <div class="relative w-full sm:w-56">
+                            <x-dropdown align="right" width="56">
+                                <x-slot name="trigger">
+                                    <button type="button"
+                                        class="flex items-center justify-between w-full py-2.5 px-4 text-sm text-gray-700 bg-white border border-gray-200 rounded-xl shadow-sm transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-400 hover:border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:border-gray-500">
+                                        <span class="truncate">{{ $selectedStatusName }}</span>
+                                        <i
+                                            class="fa-solid fa-chevron-down text-xs text-gray-400 dark:text-gray-500 ml-2"></i>
+                                    </button>
+                                </x-slot>
+
+                                <x-slot name="content">
+                                    <x-dropdown-link href="#"
+                                        onclick="event.preventDefault(); document.getElementById('hidden_status').value=''; document.getElementById('filterForm').submit();"
+                                        class="{{ $currentStatus === null || $currentStatus === '' ? 'bg-orange-50 text-orange-600 font-bold dark:bg-gray-700 dark:text-orange-400' : 'text-gray-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+                                        สถานะทั้งหมด
+                                    </x-dropdown-link>
+
+                                    <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+
+                                    @foreach ($statusList as $key => $label)
+                                        <x-dropdown-link href="#"
+                                            onclick="event.preventDefault(); document.getElementById('hidden_status').value='{{ $key }}'; document.getElementById('filterForm').submit();"
+                                            class="{{ $currentStatus === (string) $key ? 'bg-orange-50 text-orange-600 font-bold dark:bg-gray-700 dark:text-orange-400' : 'text-gray-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+                                            {{ $label }}
+                                        </x-dropdown-link>
+                                    @endforeach
+                                </x-slot>
+                            </x-dropdown>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-600 dark:text-gray-400 transition-colors duration-200">
+                    <thead
+                        class="text-xs text-gray-500 uppercase bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700 transition-colors duration-200">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 font-semibold w-20 text-center">ลำดับ</th>
+                            <th scope="col" class="px-6 py-4 font-semibold">ชื่อโครงงาน</th>
+                            <th scope="col" class="px-6 py-4 font-semibold text-center whitespace-nowrap">สถานะ</th>
+                            <th scope="col" class="px-6 py-4 font-semibold whitespace-nowrap">วันที่เสนอ</th>
+                            <th scope="col" class="px-6 py-4 font-semibold whitespace-nowrap">อัปเดตล่าสุด</th>
+                            <th scope="col" class="px-6 py-4 font-semibold text-center w-32">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 dark:divide-gray-700">
+                        @forelse ($proposals as $proposal)
+                            <tr
+                                class="hover:bg-orange-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200 group">
+
+                                <td class="px-6 py-5 text-center text-gray-500 dark:text-gray-400 font-medium">
+                                    {{ $loop->iteration + ($proposals->currentPage() - 1) * $proposals->perPage() }}
+                                </td>
+
+                                <td class="px-6 py-5">
+                                    <div
+                                        class="font-bold text-gray-900 dark:text-white text-sm group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors line-clamp-2">
+                                        {{ $proposal->title }}
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-5 text-center">
+                                    @switch($proposal->status)
+                                        @case(0)
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400 whitespace-nowrap">
+                                                <i class="fa-solid fa-circle-check mr-1.5"></i> เสร็จสิ้น
+                                            </span>
+                                        @break
+
+                                        @case(1)
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/20 dark:text-amber-400 whitespace-nowrap">
+                                                <i class="fa-solid fa-clock mr-1.5"></i> รอการพิจารณา
+                                            </span>
+                                        @break
+
+                                        @case(2)
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/20 dark:text-rose-400 whitespace-nowrap">
+                                                <i class="fa-solid fa-circle-xmark mr-1.5"></i> ถูกปฏิเสธ
+                                            </span>
+                                        @break
+
+                                        @default
+                                            <span
+                                                class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-600 border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 whitespace-nowrap">
+                                                สถานะไม่รู้จัก
+                                            </span>
+                                    @endswitch
+                                </td>
+
+                                <td class="px-6 py-5 text-gray-500 dark:text-gray-400 text-sm whitespace-nowrap">
+                                    {{ $proposal->created_at->format('d/m/Y') }}
+                                </td>
+
+                                <td class="px-6 py-5 text-gray-500 dark:text-gray-400 text-sm whitespace-nowrap">
+                                    {{ $proposal->updated_at->format('d/m/Y') }}
+                                </td>
+
+                                <td class="px-6 py-5 text-center">
+                                    <div class="flex items-center justify-center gap-2">
+                                        @if ($proposal->status == 1)
+                                            <button type="button" title="พิจารณาอนุมัติ"
+                                                onclick="window.location.href='{{ route('advisor.propose.approveFormView', $proposal->id) }}'"
+                                                class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-emerald-400 transition-colors">
+                                                <i class="fa-solid fa-clipboard-check"></i>
+                                            </button>
+                                        @else
+                                            <button type="button" title="รายละเอียด"
+                                                onclick="window.location.href='{{ route('advisor.propose.approveView', $proposal->id) }}'"
+                                                class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-orange-50 hover:text-orange-500 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-orange-400 transition-colors">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </button>
+                                        @endif
+
+                                        <button type="button" title="ประวัติการแก้ไข"
+                                            onclick="window.location.href='{{ route('advisor.propose.history', $proposal->id) }}'"
+                                            class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-500 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-blue-400 transition-colors">
+                                            <i class="fa-solid fa-clock-rotate-left"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                                <tr>
+                                    <td class="px-6 py-16 text-center text-gray-500 dark:text-gray-400" colspan="6">
+                                        <div class="flex flex-col items-center justify-center">
+                                            <i
+                                                class="fa-solid fa-folder-open text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                                            <p class="text-base font-medium">ไม่พบรายการเสนอหัวข้อโครงงาน</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                @if ($proposals->hasPages())
+                    <div
+                        class="p-4 border-t border-gray-100 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 transition-colors duration-200 rounded-b-xl">
+                        {{ $proposals->links() }}
+                    </div>
+                @endif
+
+            </div>
+        </div>
+
+        @push('scripts')
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    @if (session('success'))
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'สำเร็จ',
+                            text: "{{ session('success') }}",
+                            confirmButtonText: 'ตกลง',
+                            confirmButtonColor: '#f97316'
+                        });
+                    @endif
+
+                    @if ($errors->any())
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด',
+                            text: "{{ $errors->first() }}",
+                            confirmButtonText: 'ตกลง',
+                            confirmButtonColor: '#f97316'
+                        });
+                    @endif
                 });
-            @endif
-        </script>
+            </script>
+        @endpush
     </x-app-layout>

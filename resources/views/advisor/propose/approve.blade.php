@@ -1,210 +1,234 @@
 <x-app-layout>
-    <div class="mt-16 py-8">
-        <div class="max-w-4xl mx-auto py-8">
-            <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">การอนุมัติเสนอหัวข้อ</h2>
+    <div class="p-6 max-w-7xl mx-auto mt-4">
 
-                @if (session('success'))
-                    <div
-                        class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-100 dark:bg-green-800 dark:text-green-200">
-                        {{ session('success') }}
-                    </div>
-                @endif
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <h1
+                    class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-check text-orange-500"></i> พิจารณาข้อเสนอโครงงาน
+                </h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    ตรวจสอบรายละเอียดและดำเนินการบันทึกผลการพิจารณาหัวข้อ
+                </p>
+            </div>
+            <a href="{{ route('advisor.propose.index') }}"
+                class="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 text-sm font-medium">
+                <i class="fa-solid fa-arrow-left"></i> ย้อนกลับ
+            </a>
+        </div>
 
-                <form method="POST" action="{{ route('advisor.propose.approve', $proposal->id) }}">
-                    @csrf
-                    @method('PUT')
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                    <!-- สมาชิกกลุ่ม -->
-                    <div class="mb-6">
-                        <label class="block text-md font-medium text-gray-700 dark:text-gray-300">สมาชิกกลุ่ม</label>
-                        <ul class="list-disc ml-5 mt-2">
-                            @forelse ($groupMembers as $member)
-                                <li class="text-gray-900 dark:text-white">
-                                    {{ $member->student->name ?? 'นักศึกษาที่ไม่รู้จัก' }}</li>
-                            @empty
-                                <li class="text-gray-500">ไม่มีสมาชิกในกลุ่มนี้</li>
-                            @endforelse
-                        </ul>
-                    </div>
+            <div class="lg:col-span-2 space-y-6">
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 lg:p-8">
 
-                    <!-- ชื่อโครงงาน -->
-                    <div class="mb-4">
-                        <label for="title"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">ชื่อโครงงาน</label>
-                        <input type="text" id="title" value="{{ $proposal->title }}"
-                            class="block w-full mt-1 rounded-md shadow-sm border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                            disabled>
-                    </div>
-
-                    <!-- วัตถุประสงค์ -->
-                    <div class="mb-4">
-                        <label for="objective"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">วัตถุประสงค์</label>
-                        <textarea id="objective" rows="1"
-                            class="auto-expand block w-full mt-1 rounded-md shadow-sm border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                            disabled>{{ $proposal->objective }}</textarea>
+                    <div class="mb-8 pb-6 border-b border-gray-100 dark:border-gray-700">
+                        <div
+                            class="text-[11px] font-bold text-orange-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <i class="fa-solid fa-book"></i> ชื่อหัวข้อโครงงานวิจัย
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white leading-tight">
+                            {{ $proposal->title }}
+                        </h2>
+                        <div class="mt-4">
+                            <span
+                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 border border-blue-200 dark:border-blue-500/30">
+                                {{ $proposal->project_type->name ?? 'ไม่ระบุประเภท' }}
+                            </span>
+                        </div>
                     </div>
 
-                    <!-- ขอบเขต -->
-                    <div class="mb-4">
-                        <label for="scope"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">ขอบเขต</label>
-                        <textarea id="scope" rows="1"
-                            class="auto-expand block w-full mt-1 rounded-md shadow-sm border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                            disabled>{{ $proposal->scope }}</textarea>
+                    <div class="space-y-8">
+                        <div>
+                            <h3
+                                class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-bullseye text-orange-500 text-xs"></i> วัตถุประสงค์
+                            </h3>
+                            <div
+                                class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50 dark:bg-gray-900/50 p-5 rounded-2xl border border-gray-100 dark:border-gray-700">
+                                {!! nl2br(e($proposal->objective ?: 'ไม่มีข้อมูล')) !!}
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3
+                                class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-crop-simple text-blue-500 text-xs"></i> ขอบเขต
+                            </h3>
+                            <div
+                                class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50 dark:bg-gray-900/50 p-5 rounded-2xl border border-gray-100 dark:border-gray-700">
+                                {!! nl2br(e($proposal->scope ?: 'ไม่มีข้อมูล')) !!}
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3
+                                class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-screwdriver-wrench text-purple-500 text-xs"></i> เครื่องมือที่ใช้
+                            </h3>
+                            <div
+                                class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed bg-gray-50 dark:bg-gray-900/50 p-5 rounded-2xl border border-gray-100 dark:border-gray-700">
+                                {!! nl2br(e($proposal->tools ?: 'ไม่มีข้อมูล')) !!}
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- เครื่องมือ -->
-                    <div class="mb-4">
-                        <label for="tools"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">เครื่องมือ</label>
-                        <textarea id="tools" rows="1"
-                            class="auto-expand block w-full mt-1 rounded-md shadow-sm border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                            disabled>{{ $proposal->tools }}</textarea>
-                    </div>
+                </div>
+            </div>
 
-                    <!-- ประเภทโครงงาน -->
-                    <div class="mb-6">
-                        <label for="type_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            ประเภทโครงงาน
-                        </label>
+            <div class="space-y-6">
 
-                        {{-- กรณีแสดงเท่านั้น --}}
-                        {{-- <input type="text" id="type_id" value="{{ $proposal->exam_type->name }}" disabled
-                            class="block w-full mt-1 rounded-md shadow-sm border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600"> --}}
-                        <ul class="mt-2">
-                            <li class="text-gray-900 dark:text-white">
-                                {{ $proposal->project_type->name }}</li>
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                    <h3
+                        class="text-sm font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider mb-4 border-b border-gray-100 dark:border-gray-700 pb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-users text-gray-400"></i> สมาชิกกลุ่ม
+                    </h3>
+                    <ul class="space-y-3">
+                        @forelse ($groupMembers as $member)
+                            <li class="flex items-center gap-3 text-sm text-gray-700 dark:text-gray-300">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-orange-100 dark:bg-orange-500/20 flex items-center justify-center text-orange-500 shadow-sm shrink-0">
+                                    <i class="fa-solid fa-user text-xs"></i>
+                                </div>
+                                <span class="font-medium">{{ $member->student->name ?? 'ไม่ระบุชื่อ' }}</span>
+                            </li>
+                        @empty
+                            <li class="text-sm text-gray-500 dark:text-gray-400 py-2">ไม่มีสมาชิกในกลุ่มนี้</li>
+                        @endforelse
+                    </ul>
+                </div>
 
-                        </ul>
-                    </div>
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-orange-200 dark:border-orange-500/30 p-6 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-orange-400 to-red-500"></div>
 
-                    <!-- ตัวเลือกการอนุมัติ -->
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">การอนุมัติ</label>
-                        <div class="flex items-center space-x-4 mt-2">
-                            <label class="flex items-center">
-                                <input type="radio" name="approval" value="approved" id="approved"
-                                    class="text-blue-500 focus:ring-blue-500">
-                                <span class="ml-2 text-gray-900 dark:text-white">อนุมัติ</span>
+                    <h3
+                        class="text-sm font-bold text-gray-800 dark:text-white uppercase tracking-wider mb-5 mt-2 flex items-center gap-2">
+                        <i class="fa-solid fa-gavel text-gray-400"></i> ผลการพิจารณา
+                    </h3>
+
+                    <form method="POST" action="{{ route('advisor.propose.approve', $proposal->id) }}" id="evalForm">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="flex flex-col gap-3 mb-6">
+                            <label
+                                class="relative flex items-center p-4 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-emerald-50 dark:hover:bg-emerald-500/5 transition-all group has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50 dark:has-[:checked]:bg-emerald-500/10">
+                                <input name="approval" type="radio" value="approved" id="approved"
+                                    class="w-4 h-4 text-emerald-600 bg-white border-gray-300 focus:ring-emerald-500"
+                                    {{ in_array($proposal->status, [0, 5]) ? 'checked' : '' }}
+                                    {{ in_array($proposal->status, [0, 2]) ? 'disabled' : '' }}>
+                                <span
+                                    class="ml-3 text-sm font-bold text-gray-700 dark:text-gray-200 group-hover:text-emerald-700 dark:group-hover:text-emerald-400">อนุมัติข้อเสนอ</span>
                             </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="approval" value="rejected" id="rejected"
-                                    class="text-red-500 focus:ring-red-500">
-                                <span class="ml-2 text-gray-900 dark:text-white">ปฏิเสธ</span>
+
+                            <label
+                                class="relative flex items-center p-4 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-500/5 transition-all group has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50 dark:has-[:checked]:bg-rose-500/10">
+                                <input name="approval" type="radio" value="rejected" id="rejected"
+                                    class="w-4 h-4 text-rose-600 bg-white border-gray-300 focus:ring-rose-500"
+                                    {{ $proposal->status == 2 ? 'checked' : '' }}
+                                    {{ in_array($proposal->status, [0, 2]) ? 'disabled' : '' }}>
+                                <span
+                                    class="ml-3 text-sm font-bold text-gray-700 dark:text-gray-200 group-hover:text-rose-700 dark:group-hover:text-rose-400">ไม่อนุมัติ
+                                    (ส่งแก้ไข)</span>
                             </label>
                         </div>
                         @error('approval')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-rose-500 text-xs mb-4">{{ $message }}</p>
                         @enderror
-                    </div>
 
-                    <!-- เหตุผลในการปฏิเสธ -->
-                    <div class="mb-4 hidden" id="rejection-reason">
-                        <label for="reason"
-                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">เหตุผลในการปฏิเสธ</label>
-                        <textarea name="reason" id="reason" rows="4"
-                            class="block w-full mt-1 rounded-md shadow-sm border-gray-300 focus:ring-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600"></textarea>
-                        @error('reason')
-                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
+                        <div id="rejection-reason" class="mb-6 animate-fade-in-up"
+                            style="{{ !in_array($proposal->status, [0, 2]) && !old('approval', '') ? 'display:none;' : '' }}">
+                            <label for="reason"
+                                class="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">
+                                ความคิดเห็น / ข้อเสนอแนะ <span class="text-rose-500">*</span>
+                            </label>
+                            <textarea name="reason" id="reason" rows="4" placeholder="ระบุสิ่งที่ต้องการให้แก้ไข..."
+                                class="block w-full px-4 py-3 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-xl focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-900 dark:border-gray-700 dark:placeholder-gray-500 dark:text-white transition-colors custom-scrollbar"
+                                {{ in_array($proposal->status, [0, 2]) ? 'disabled' : '' }}>{{ $proposal->comments }}</textarea>
+                            @error('reason')
+                                <p class="text-rose-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-                    {{-- <!-- ปุ่มต่างๆ -->
-                    <div class="flex justify-end space-x-4">
-                        <button type="submit"
-                            class="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:bg-blue-700 focus:outline-none">
-                            ส่ง
-                        </button>
-                        <a href="{{ route('advisor.propose.index') }}"
-                            class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:bg-gray-700 focus:outline-none">
-                            ย้อนกลับ
-                        </a>
-                    </div> --}}
+                        @if (!in_array($proposal->status, [0, 2]))
+                            <button type="submit"
+                                class="w-full px-5 py-3 text-sm font-bold text-white bg-orange-500 rounded-xl hover:bg-orange-600 shadow-md shadow-orange-500/20 flex items-center justify-center gap-2 transition-colors">
+                                <i class="fa-solid fa-paper-plane"></i> บันทึกผลการพิจารณา
+                            </button>
+                        @else
+                            <div
+                                class="text-center text-sm font-medium text-gray-500 bg-gray-100 dark:bg-gray-700/50 py-3 rounded-xl border border-dashed border-gray-300 dark:border-gray-600">
+                                <i class="fa-solid fa-lock mr-1.5"></i> บันทึกข้อมูลแล้ว
+                            </div>
+                        @endif
 
-                    <!-- Buttons -->
-                    <div class="flex justify-end space-x-4">
-                        <button type="submit"
-                            class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600">
-                            บันทึก
-                        </button>
-                        <button type="button" onclick="window.location.href='{{ route('advisor.propose.index') }}'"
-                            class="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-md focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-red-500 dark:hover:bg-red-600">
-                            ยกเลิก
-                        </button>
-                    </div>
-                </form>
+                    </form>
+                </div>
+
             </div>
         </div>
     </div>
 
-    {{-- <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelectorAll('.auto-expand').forEach(function(textarea) {
-                textarea.style.height = "auto";
-                textarea.style.height = textarea.scrollHeight + "px";
-            });
-        });
-    </script> --}}
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const rejectedRadio = document.getElementById('rejected');
+                const approvedRadio = document.getElementById('approved');
+                const rejectionReason = document.getElementById('rejection-reason');
 
-    <!-- แสดง/ซ่อนเหตุผลในการปฏิเสธ -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const rejectedRadio = document.getElementById('rejected');
-            const approvedRadio = document.getElementById('approved');
-            const rejectionReason = document.getElementById('rejection-reason');
-
-            rejectedRadio.addEventListener('change', () => {
-                rejectionReason.classList.remove('hidden');
-            });
-
-            approvedRadio.addEventListener('change', () => {
-                rejectionReason.classList.add('hidden');
-            });
-        });
-    </script>
-
-    <!-- สคริปต์ปรับขนาด textarea -->
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelectorAll('.auto-expand').forEach(textarea => {
-                const adjust = el => {
-                    // รีเซ็ตความสูงเดิม
-                    el.style.height = 'auto';
-                    // ดึงความสูงบรรทัดจาก CSS
-                    const lineHeight = parseInt(window.getComputedStyle(el).lineHeight);
-                    // ปรับความสูง = ความสูงเนื้อหา + 1 row เพิ่มเติม
-                    el.style.height = (el.scrollHeight + lineHeight) + 'px';
+                // ฟังก์ชันเช็คสถานะการแสดงผลกล่องเหตุผล
+                const checkStatus = () => {
+                    if (rejectedRadio.checked) {
+                        rejectionReason.style.display = 'block';
+                    } else {
+                        rejectionReason.style.display = 'none';
+                    }
                 };
-                // เรียกปรับขนาดตอนโหลดครั้งแรก
-                adjust(textarea);
-                // เรียกปรับขนาดทุกครั้งที่มีการพิมพ์
-                textarea.addEventListener('input', () => adjust(textarea));
+
+                // ผูกเหตุการณ์เมื่อเปลี่ยนตัวเลือก
+                rejectedRadio.addEventListener('change', checkStatus);
+                approvedRadio.addEventListener('change', checkStatus);
+
+                // สคริปต์ปรับขนาด textarea อัตโนมัติ (ที่คุณต้องการ)
+                document.querySelectorAll('.auto-expand').forEach(textarea => {
+                    const adjust = el => {
+                        el.style.height = 'auto';
+                        const lineHeight = parseInt(window.getComputedStyle(el).lineHeight) || 20;
+                        el.style.height = (el.scrollHeight + lineHeight) + 'px';
+                    };
+                    adjust(textarea);
+                    textarea.addEventListener('input', () => adjust(textarea));
+                });
+
+                // SweetAlert สำหรับแจ้งเตือน
+                @if (session('success'))
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'บันทึกสำเร็จ',
+                        text: "{{ session('success') }}",
+                        confirmButtonColor: '#f97316'
+                    });
+                @endif
+                @if (session('error'))
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: {!! json_encode(session('error')) !!},
+                        confirmButtonColor: '#f97316'
+                    });
+                @endif
+                @if ($errors->any())
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'ข้อมูลไม่ครบถ้วน',
+                        text: "กรุณาตรวจสอบข้อมูลอีกครั้ง",
+                        confirmButtonColor: '#f97316'
+                    });
+                @endif
             });
-        });
-    </script>
-
-    <!-- SweetAlert2 for error notifications -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            @if(session('error'))
-                Swal.fire({
-                    icon: 'error',
-                    title: 'เกิดข้อผิดพลาด',
-                    text: {!! json_encode(session('error')) !!}
-                });
-            @endif
-
-            @if($errors->any())
-                const laravelErrors = {!! json_encode($errors->all()) !!};
-                Swal.fire({
-                    icon: 'error',
-                    title: 'พบข้อผิดพลาด',
-                    timer: 3000,
-                    html: laravelErrors.map(e => `<div class="text-center">${e}</div>`).join('')
-                });
-            @endif
-        });
-    </script>
+        </script>
+    @endpush
 </x-app-layout>
