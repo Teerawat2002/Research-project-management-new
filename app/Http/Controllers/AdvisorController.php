@@ -175,29 +175,60 @@ class AdvisorController extends Controller
 
 
     // Submission setting
+    // public function submissionIndex(Request $request)
+    // {
+    //     // ดึง advisor ที่ล็อกอิน
+    //     $advisor = Auth::guard('advisors')->user();
+
+    //     // สร้าง query บน Propose
+    //     $proposeQuery = Propose::where('a_id', $advisor->id);
+
+    //     // กรองถ้ามี search
+    //     if ($search = $request->input('search')) {
+    //         $proposeQuery->where('title', 'like', "%{$search}%");
+    //     }
+
+    //     // เอาแค่ id ของ Propose ที่ผ่านเงื่อนไข
+    //     $proposeIds = $proposeQuery->pluck('id');
+
+    //     // เตรียม fetch ExamSubmission พร้อม relationship
+    //     $examSubmissions = ExamSubmission::whereIn('propose_id', $proposeIds)
+    //         ->orderBy('updated_at', 'desc')
+    //         ->paginate(10)
+    //         ->withQueryString();  // เก็บ search/page ใน URL ด้วย
+
+    //     // ส่งไป View (ชื่อตัวแปรต้องตรงกันกับ Blade)
+    //     return view('advisor.submission.index', compact('examSubmissions'));
+    // }
     public function submissionIndex(Request $request)
     {
         // ดึง advisor ที่ล็อกอิน
         $advisor = Auth::guard('advisors')->user();
 
-        // สร้าง query บน Propose
-        $proposeQuery = Propose::where('a_id', $advisor->id);
+        // เริ่มต้น Query สร้าง exam submissions
+        // โดยหา propose_id ที่ตรงกับอาจารย์ที่ปรึกษาท่านนี้
+        $query = ExamSubmission::whereHas('propose', function ($q) use ($advisor) {
+            $q->where('a_id', $advisor->id);
+        });
 
-        // กรองถ้ามี search
+        // 1. กรองด้วยคำค้นหา (ชื่อโครงงาน)
         if ($search = $request->input('search')) {
-            $proposeQuery->where('title', 'like', "%{$search}%");
+            $query->whereHas('propose', function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%");
+            });
         }
 
-        // เอาแค่ id ของ Propose ที่ผ่านเงื่อนไข
-        $proposeIds = $proposeQuery->pluck('id');
+        // 2. กรองด้วยสถานะ (Status)
+        $status = $request->input('status');
+        if ($status !== null && $status !== '') {
+            $query->where('status', $status);
+        }
 
-        // เตรียม fetch ExamSubmission พร้อม relationship
-        $examSubmissions = ExamSubmission::whereIn('propose_id', $proposeIds)
-            ->orderBy('updated_at', 'desc')
+        // ดึงข้อมูล
+        $examSubmissions = $query->orderBy('updated_at', 'desc')
             ->paginate(10)
-            ->withQueryString();  // เก็บ search/page ใน URL ด้วย
+            ->withQueryString();
 
-        // ส่งไป View (ชื่อตัวแปรต้องตรงกันกับ Blade)
         return view('advisor.submission.index', compact('examSubmissions'));
     }
 
@@ -734,6 +765,58 @@ class AdvisorController extends Controller
     }
 
     /* Revision Management */
+    // public function revisionIndex(Request $request)
+    // {
+    //     $advisor = Auth::guard('advisors')->user();
+
+    //     // 1) หาทุก invi_group_member_id ของอาจารย์
+    //     $inviGroupIds = InviGroupMember::where('a_id', $advisor->id)->pluck('id');
+
+    //     $examInvi = ExamInviMember::whereIn('invi_member_id', $inviGroupIds)
+    //         ->firstOrFail();
+    //     // dd($examInvi);
+
+    //     // 2) หา submission_id ที่อาจารย์นี้เป็น invigilator
+    //     $submissionIds = ExamInviMember::whereIn('invi_member_id', $inviGroupIds)
+    //         ->where('role', 1)
+    //         ->pluck('submission_id');
+    //     // dd($submissionIds);
+
+    //     $search = trim((string) $request->input('search', ''));
+
+    //     $query = Revision::whereIn('submission_id', $submissionIds)
+    //         ->whereHas('exam_submission', fn($q) => $q->where('status', 0));
+
+    //     if ($search !== '') {
+    //         $query->whereHas(
+    //             'exam_submission.propose',
+    //             fn($q) =>
+    //             $q->where('title', 'like', "%{$search}%")
+    //         );
+    //     }
+
+    //     $revisions = $query
+    //         ->with([
+    //             // ดึง myApproval ของ “อาจารย์คนนี้” เท่านั้น
+    //             'myApproval' => fn($q) => $q
+    //                 ->whereHas(
+    //                     'exam_invi_member',
+    //                     fn($qq) =>
+    //                     $qq->whereIn('invi_member_id', $inviGroupIds)
+    //                         ->where('role', 1)
+    //                 )
+    //                 ->latest('id') // กันกรณีมีหลายแถว เผื่อแก้ไขซ้ำ
+    //                 ->limit(1),
+    //             // เผื่อใช้ชื่อโครงงานใน view
+    //             'exam_submission.propose:id,title',
+    //         ])
+    //         ->orderByDesc('updated_at')
+    //         ->paginate(10)
+    //         ->appends(['search' => $search]);
+
+    //     return view('advisor.revision.index', compact('revisions', 'search'));
+    // }
+
     public function revisionIndex(Request $request)
     {
         $advisor = Auth::guard('advisors')->user();
@@ -741,32 +824,47 @@ class AdvisorController extends Controller
         // 1) หาทุก invi_group_member_id ของอาจารย์
         $inviGroupIds = InviGroupMember::where('a_id', $advisor->id)->pluck('id');
 
-        $examInvi = ExamInviMember::whereIn('invi_member_id', $inviGroupIds)
-            ->firstOrFail();
-        // dd($examInvi);
-
-        // 2) หา submission_id ที่อาจารย์นี้เป็น invigilator
+        // 2) หา submission_id ที่อาจารย์นี้เป็น invigilator และเป็นประธาน/อาจารย์ที่ปรึกษา (role = 1)
         $submissionIds = ExamInviMember::whereIn('invi_member_id', $inviGroupIds)
             ->where('role', 1)
             ->pluck('submission_id');
-        // dd($submissionIds);
 
         $search = trim((string) $request->input('search', ''));
+        $status = $request->input('status'); // รับค่า status จาก dropdown
 
         $query = Revision::whereIn('submission_id', $submissionIds)
             ->whereHas('exam_submission', fn($q) => $q->where('status', 0));
 
+        // กรองด้วยชื่อโครงงาน
         if ($search !== '') {
             $query->whereHas(
                 'exam_submission.propose',
-                fn($q) =>
-                $q->where('title', 'like', "%{$search}%")
+                fn($q) => $q->where('title', 'like', "%{$search}%")
             );
+        }
+
+        // กรองด้วยสถานะ (Status ของ Approval)
+        if ($status !== null && $status !== '') {
+            if ($status == '2') {
+                // กรณี "รอพิจารณา" คือยังไม่มี approval หรือ มีแต่ status = 2
+                $query->where(function ($q) use ($inviGroupIds) {
+                    $q->doesntHave('myApproval')
+                        ->orWhereHas('myApproval', function ($qq) use ($inviGroupIds) {
+                            $qq->where('status', 2)
+                                ->whereHas('exam_invi_member', fn($qqq) => $qqq->whereIn('invi_member_id', $inviGroupIds)->where('role', 1));
+                        });
+                });
+            } else {
+                // กรณี อนุมัติ (1) หรือ ไม่อนุมัติ (3) ต้องมี Approval และ status ตรงกัน
+                $query->whereHas('myApproval', function ($q) use ($status, $inviGroupIds) {
+                    $q->where('status', $status)
+                        ->whereHas('exam_invi_member', fn($qq) => $qq->whereIn('invi_member_id', $inviGroupIds)->where('role', 1));
+                });
+            }
         }
 
         $revisions = $query
             ->with([
-                // ดึง myApproval ของ “อาจารย์คนนี้” เท่านั้น
                 'myApproval' => fn($q) => $q
                     ->whereHas(
                         'exam_invi_member',
@@ -774,14 +872,14 @@ class AdvisorController extends Controller
                         $qq->whereIn('invi_member_id', $inviGroupIds)
                             ->where('role', 1)
                     )
-                    ->latest('id') // กันกรณีมีหลายแถว เผื่อแก้ไขซ้ำ
+                    ->latest('id')
                     ->limit(1),
-                // เผื่อใช้ชื่อโครงงานใน view
                 'exam_submission.propose:id,title',
+                'exam_submission.exam_type:id,name', // โหลดรายวิชามาด้วยเพื่อป้องกัน N+1
             ])
             ->orderByDesc('updated_at')
             ->paginate(10)
-            ->appends(['search' => $search]);
+            ->appends(['search' => $search, 'status' => $status]); // แปะ status เข้า pagination ด้วย
 
         return view('advisor.revision.index', compact('revisions', 'search'));
     }

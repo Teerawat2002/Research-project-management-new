@@ -3,8 +3,9 @@
 
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200">
-                    Exam Submissions
+                <h1
+                    class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-file-invoice text-orange-500"></i> Exam Submissions
                 </h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 transition-colors duration-200">
                     รายการยื่นสอบ การจัดตาราง และการประเมินผลโครงงาน
@@ -13,26 +14,84 @@
         </div>
 
         <div
-            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200 overflow-hidden">
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200">
 
             <div
                 class="p-5 border-b border-gray-50 dark:border-gray-700 bg-white dark:bg-gray-800 transition-colors duration-200">
-                <form method="GET" action="{{ route('advisor.submission.index') }}"
-                    class="flex flex-col sm:flex-row gap-3 w-full">
+                <form method="GET" action="{{ route('advisor.submission.index') }}" id="filterForm"
+                    class="flex flex-col md:flex-row justify-between items-center gap-4 w-full">
                     @csrf
-                    <div class="relative w-full sm:w-96">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <i class="fa-solid fa-magnifying-glass text-gray-400 dark:text-gray-500"></i>
+                    <input type="hidden" name="status" id="hidden_status" value="{{ request('status') }}">
+
+                    <div class="flex gap-2 w-full md:max-w-md">
+                        <div class="relative w-full">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <i class="fa-solid fa-magnifying-glass text-gray-400 dark:text-gray-500"></i>
+                            </div>
+                            <input type="text" name="search" value="{{ request('search') }}"
+                                class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-200 rounded-xl bg-gray-50 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 transition-colors duration-200"
+                                placeholder="ค้นหาด้วยชื่อโครงงาน...">
                         </div>
-                        <input type="text" name="search" value="{{ request('search') }}"
-                            class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-200 rounded-xl bg-gray-50 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 transition-colors duration-200"
-                            placeholder="ค้นหาด้วยชื่อโครงงาน...">
+
+                        <button type="submit"
+                            class="px-5 py-2.5 text-sm font-medium text-white bg-orange-500 rounded-xl hover:bg-orange-600 shadow-sm transition-colors duration-200 shrink-0 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-search"></i> ค้นหา
+                        </button>
                     </div>
 
-                    <button type="submit"
-                        class="px-5 py-2.5 text-sm font-medium text-white bg-orange-500 rounded-xl hover:bg-orange-600 shadow-sm transition-colors duration-200 shrink-0 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-search"></i> ค้นหา
-                    </button>
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <label class="text-sm font-semibold text-gray-700 dark:text-gray-300 shrink-0 hidden sm:block">
+                            <i class="fa-solid fa-filter mr-1 text-orange-500"></i> สถานะ:
+                        </label>
+
+                        @php
+                            // รายการสถานะทั้งหมดของ Exam Submission
+                            $statusList = [
+                                'null' => 'ยังไม่ได้ยื่นสอบ', // สมมติว่าต้องการหากรณีที่เป็น default หรือ NULL ถ้าต้องการให้ลบออกได้ครับ
+                                '1' => 'รอการอนุมัติ',
+                                '3' => 'รอจัดตารางสอบ',
+                                '4' => 'กำลังดำเนินการสอบ',
+                                '0' => 'การสอบเสร็จสิ้น',
+                                '2' => 'ยื่นสอบไม่ผ่าน',
+                            ];
+                            $currentStatus = request('status');
+                            $selectedStatusName =
+                                $currentStatus !== null && $currentStatus !== ''
+                                    ? $statusList[$currentStatus] ?? 'สถานะทั้งหมด'
+                                    : 'สถานะทั้งหมด';
+                        @endphp
+
+                        <div class="relative w-full sm:w-56">
+                            <x-dropdown align="right" width="56">
+                                <x-slot name="trigger">
+                                    <button type="button"
+                                        class="flex items-center justify-between w-full py-2.5 px-4 text-sm text-gray-700 bg-white border border-gray-200 rounded-xl shadow-sm transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-orange-400 hover:border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 dark:hover:border-gray-500">
+                                        <span class="truncate">{{ $selectedStatusName }}</span>
+                                        <i
+                                            class="fa-solid fa-chevron-down text-xs text-gray-400 dark:text-gray-500 ml-2"></i>
+                                    </button>
+                                </x-slot>
+
+                                <x-slot name="content">
+                                    <x-dropdown-link href="#"
+                                        onclick="event.preventDefault(); document.getElementById('hidden_status').value=''; document.getElementById('filterForm').submit();"
+                                        class="{{ $currentStatus === null || $currentStatus === '' ? 'bg-orange-50 text-orange-600 font-bold dark:bg-gray-700 dark:text-orange-400' : 'text-gray-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+                                        สถานะทั้งหมด
+                                    </x-dropdown-link>
+
+                                    <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+
+                                    @foreach ($statusList as $key => $label)
+                                        <x-dropdown-link href="#"
+                                            onclick="event.preventDefault(); document.getElementById('hidden_status').value='{{ $key === 'null' ? 'default_null_value' : $key }}'; document.getElementById('filterForm').submit();"
+                                            class="{{ $currentStatus === (string) $key ? 'bg-orange-50 text-orange-600 font-bold dark:bg-gray-700 dark:text-orange-400' : 'text-gray-700 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-white' }}">
+                                            {{ $label }}
+                                        </x-dropdown-link>
+                                    @endforeach
+                                </x-slot>
+                            </x-dropdown>
+                        </div>
+                    </div>
                 </form>
             </div>
 
@@ -121,13 +180,11 @@
 
                                         @switch($submission->status)
                                             @case(0)
-                                                {{-- การสอบเสร็จสิ้น --}}
                                                 <button type="button" title="รายละเอียด"
                                                     onclick="window.location.href='{{ route('advisor.submission.view', $submission->id) }}'"
                                                     class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-blue-400 transition-colors">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </button>
-
                                                 @if (strtolower($submission->exam_type->name ?? '') !== 'aucc')
                                                     <button type="button" title="ประวัติ"
                                                         onclick="window.location.href='{{ route('advisor.submission.history', $submission->id) }}'"
@@ -140,7 +197,6 @@
                                                         <i class="fa-solid fa-calendar"></i>
                                                     </button>
                                                 @endif
-
                                                 <button type="button" title="ดูเกรด / ให้คะแนน"
                                                     onclick="window.location.href='{{ route('advisor.score.view', $submission->id) }}'"
                                                     class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-emerald-400 transition-colors">
@@ -149,7 +205,6 @@
                                             @break
 
                                             @case(1)
-                                                {{-- รอการอนุมัติ --}}
                                                 @if (strtolower($submission->exam_type->name ?? '') == 'aucc')
                                                     <button type="button" title="ให้คะแนน AUCC"
                                                         onclick="window.location.href='{{ route('advisor.submission.auccForm', $submission->id) }}'"
@@ -177,7 +232,6 @@
 
                                             @case(2)
                                             @case(4)
-                                                {{-- ยื่นสอบไม่ผ่าน หรือ กำลังดำเนินการสอบ --}}
                                                 <button type="button" title="รายละเอียด"
                                                     onclick="window.location.href='{{ route('advisor.submission.view', $submission->id) }}'"
                                                     class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-blue-400 transition-colors">
@@ -196,7 +250,6 @@
                                             @break
 
                                             @case(3)
-                                                {{-- รอจัดตารางสอบ --}}
                                                 <button type="button" title="รายละเอียด"
                                                     onclick="window.location.href='{{ route('advisor.submission.view', $submission->id) }}'"
                                                     class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-blue-400 transition-colors">
@@ -246,7 +299,6 @@
         @push('scripts')
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
-                    // ตรวจสอบ success message
                     @if (session('success'))
                         Swal.fire({
                             icon: 'success',
@@ -257,7 +309,6 @@
                         });
                     @endif
 
-                    // ตรวจสอบ validation errors (แสดงข้อความแรก)
                     @if ($errors->any())
                         Swal.fire({
                             icon: 'error',
