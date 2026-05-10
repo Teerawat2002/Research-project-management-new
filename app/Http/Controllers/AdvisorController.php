@@ -987,25 +987,37 @@ class AdvisorController extends Controller
     // Upload Management
     public function uploadIndex(Request $request)
     {
+        // ตรวจสอบสิทธิ์การเข้าถึง
         $advisor = auth('advisors')->user();
+        // ถ้าไม่มีข้อมูลอาจารย์ (ไม่ได้ล็อกอิน หรือสิทธิ์ไม่ถูกต้อง) ให้เตะออกด้วย Error 403 (Forbidden)
         abort_unless($advisor, 403);
 
+        // รับค่าจาก Request (ตัวกรองข้อมูล)
         $search = $request->input('search');
+        $status = $request->input('status');
 
-        $uploads = Upload::with([
+        $query = Upload::with([
             'revision.exam_submission.propose.advisor',
             'file',
         ])
+            // กรองข้อมูลให้แสดงเฉพาะโครงงานที่อาจารย์ท่านนี้เป็นที่ปรึกษา (a_id ตรงกับ id ของอาจารย์)
             ->whereHas('revision.exam_submission.propose', function ($q) use ($advisor, $search) {
                 $q->where('a_id', $advisor->id);
 
                 if ($search) {
                     $q->where('title', 'LIKE', "%{$search}%");
                 }
-            })
-            ->latest('id')
+            });
+
+        // กรองด้วยสถานะเพิ่มเติม (ถ้ามีการเลือก Dropdown)
+        // เช็คค่าว่าต้องไม่ใช่ null และไม่ใช่ค่าว่าง (รองรับกรณีค่าสถานะเป็น '0')
+        if ($status !== null && $status !== '') {
+            $query->where('status', $status);
+        }
+
+        $uploads = $query->latest('id') 
             ->paginate(10)
-            ->withQueryString();   // pagination จำค่า search
+            ->withQueryString();
 
         return view('advisor.upload.index', compact('uploads', 'search'));
     }
@@ -1074,10 +1086,10 @@ class AdvisorController extends Controller
             ProjectGroup::where('id', $propose->group_id)
                 ->update(['status' => 0]);
 
-            // 2. ดึง student_id ทั้งหมดในกลุ่ม
+            // 2. ดึง s_id ทั้งหมดในกลุ่ม
             $studentIds = DB::table('group_members')
                 ->where('group_id', $propose->group_id)
-                ->pluck('student_id');
+                ->pluck('s_id');
 
             // 3. อัปเดตสถานะนักศึกษา
             Student::whereIn('id', $studentIds)
