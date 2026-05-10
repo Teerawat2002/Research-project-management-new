@@ -29,23 +29,40 @@ class InvigilatorController extends Controller
 {
     // Examination
 
-    public function examinationIndex()
+    public function examinationIndex(Request $request)
     {
         $advisor = Auth::guard('advisors')->user();
 
-        // 1) all pivot‐table IDs for this advisor
-        $invigilatorMemberIds = InviGroupMember::where('a_id', $advisor->id)
-            ->pluck('id');
+        // 1) all pivot-table IDs for this advisor
+        $invigilatorMemberIds = InviGroupMember::where('a_id', $advisor->id)->pluck('id');
 
         // 2) all submission IDs that have an ExamInviMember for any of those pivots
-        $submissionIds = ExamInviMember::whereIn('invi_member_id', $invigilatorMemberIds)
-            ->pluck('submission_id');
+        $submissionIds = ExamInviMember::whereIn('invi_member_id', $invigilatorMemberIds)->pluck('submission_id');
 
-        // 3) fetch the ExamSubmissions in status=4
-        $examinations = ExamSubmission::whereIn('id', $submissionIds)
-            ->whereIn('status', 0) // รอการสอบ (5) หรือ สอบเสร็จสิ้น (0)
-            ->orderByDesc('created_at')
-            ->paginate(10);
+        // รับค่าการค้นหาและสถานะจาก Request
+        $search = $request->input('search');
+        $status = $request->input('status');
+
+        $query = ExamSubmission::whereIn('id', $submissionIds);
+
+        // 3) ค้นหาตามชื่อโครงงาน
+        if ($search) {
+            $query->whereHas('propose', function ($q) use ($search) {
+                $q->where('title', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // 4) กรองตามสถานะ
+        if ($status !== null && $status !== '') {
+            $query->where('status', $status);
+        } else {
+            // หากไม่ได้เลือกสถานะ ให้แสดงเฉพาะสถานะ รอสอบ (4), หรือสอบเสร็จ (0) ตามที่เคยระบุไว้
+            $query->whereIn('status', [0, 4]);
+        }
+
+        $examinations = $query->orderByDesc('created_at')
+            ->paginate(10)
+            ->withQueryString();
 
         return view('invigilator.examination.index', compact('examinations'));
     }

@@ -31,6 +31,11 @@
                                 class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-200 rounded-xl bg-gray-50 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 transition-colors duration-200"
                                 placeholder="ค้นหาชื่อโครงงาน...">
                         </div>
+
+                        <button type="submit"
+                            class="px-5 py-2.5 text-sm font-medium text-white bg-orange-500 rounded-xl hover:bg-orange-600 shadow-sm transition-colors duration-200 shrink-0 flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-search"></i> ค้นหา
+                        </button>
                     </div>
 
                     <div class="flex items-center gap-3 w-full md:w-auto">
