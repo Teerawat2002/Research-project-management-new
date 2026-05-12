@@ -645,6 +645,7 @@ class AdvisorController extends Controller
         // ดึงเกรดที่กรรมการนี้บันทึกไว้
         $grades = ExamGrade::where('submission_id', $submissionId)
             // ->where('exam_invi_id', $invi->id)
+            ->OrderBy('created_at', 'desc')
             ->get();
 
         // พร้อมส่งข้อมูล submission และ grades ไป View
