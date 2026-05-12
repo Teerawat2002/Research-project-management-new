@@ -180,6 +180,7 @@
 
                                         @switch($submission->status)
                                             @case(0)
+                                                {{-- การสอบเสร็จสิ้น --}}
                                                 <button type="button" title="รายละเอียด"
                                                     onclick="window.location.href='{{ route('advisor.submission.view', $submission->id) }}'"
                                                     class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-blue-400 transition-colors">
@@ -197,7 +198,7 @@
                                                         <i class="fa-solid fa-calendar"></i>
                                                     </button>
                                                 @endif
-                                                <button type="button" title="ดูเกรด / ให้คะแนน"
+                                                <button type="button" title="ดูเกรด / คะแนน"
                                                     onclick="window.location.href='{{ route('advisor.score.view', $submission->id) }}'"
                                                     class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-emerald-400 transition-colors">
                                                     <i class="fa-solid fa-graduation-cap"></i>
@@ -205,6 +206,7 @@
                                             @break
 
                                             @case(1)
+                                                {{-- รอการอนุมัติ --}}
                                                 @if (strtolower($submission->exam_type->name ?? '') == 'aucc')
                                                     <button type="button" title="ให้คะแนน AUCC"
                                                         onclick="window.location.href='{{ route('advisor.submission.auccForm', $submission->id) }}'"
@@ -231,16 +233,11 @@
                                             @break
 
                                             @case(2)
-                                            @case(4)
+                                                {{-- ยื่นสอบไม่ผ่าน --}}
                                                 <button type="button" title="รายละเอียด"
                                                     onclick="window.location.href='{{ route('advisor.submission.view', $submission->id) }}'"
                                                     class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-blue-400 transition-colors">
                                                     <i class="fa-solid fa-eye"></i>
-                                                </button>
-                                                <button type="button" title="ดูตารางสอบ"
-                                                    onclick="window.location.href='{{ route('advisor.schedule.show', $submission->id) }}'"
-                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-cyan-50 hover:text-cyan-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-cyan-400 transition-colors">
-                                                    <i class="fa-solid fa-calendar"></i>
                                                 </button>
                                                 <button type="button" title="ประวัติ"
                                                     onclick="window.location.href='{{ route('advisor.submission.history', $submission->id) }}'"
@@ -250,6 +247,7 @@
                                             @break
 
                                             @case(3)
+                                                {{-- อนุมัติสอบ-จัดตาราง --}}
                                                 <button type="button" title="รายละเอียด"
                                                     onclick="window.location.href='{{ route('advisor.submission.view', $submission->id) }}'"
                                                     class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-blue-400 transition-colors">
@@ -264,6 +262,30 @@
                                                     onclick="window.location.href='{{ route('advisor.schedule.create', $submission->id) }}'"
                                                     class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-indigo-50 hover:text-indigo-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-indigo-400 transition-colors">
                                                     <i class="fa-solid fa-calendar-plus"></i>
+                                                </button>
+                                            @break
+
+                                            @case(4)
+                                                {{-- จัดตารางสอบแล้ว-กำลังดำเนินการสอบ --}}
+                                                <button type="button" title="ให้คะแนน"
+                                                    onclick="window.location.href='{{ route('advisor.score.score', $submission->id) }}'"
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-emerald-400 transition-colors">
+                                                    <i class="fa-solid fa-pen-fancy"></i>
+                                                </button>
+                                                <button type="button" title="รายละเอียด"
+                                                    onclick="window.location.href='{{ route('advisor.submission.view', $submission->id) }}'"
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-blue-50 hover:text-blue-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-blue-400 transition-colors">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </button>
+                                                <button type="button" title="ดูตารางสอบ"
+                                                    onclick="window.location.href='{{ route('advisor.schedule.show', $submission->id) }}'"
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-cyan-50 hover:text-cyan-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-cyan-400 transition-colors">
+                                                    <i class="fa-solid fa-calendar"></i>
+                                                </button>
+                                                <button type="button" title="ประวัติ"
+                                                    onclick="window.location.href='{{ route('advisor.submission.history', $submission->id) }}'"
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-gray-200 hover:text-gray-700 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-200 transition-colors">
+                                                    <i class="fa-solid fa-clock-rotate-left"></i>
                                                 </button>
                                             @break
                                         @endswitch
