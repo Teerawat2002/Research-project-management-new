@@ -1,6 +1,5 @@
 <x-app-layout>
     <div class="p-6">
-        <!-- Header Section -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200">
@@ -19,11 +18,9 @@
             </div>
         </div>
 
-        <!-- Main Card -->
         <div
             class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200">
 
-            <!-- Filters & Search -->
             <div
                 class="p-5 border-b border-gray-50 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm rounded-t-xl transition-colors duration-200">
                 <form id="filterForm" method="GET" action="{{ route('admin.alumni.project.index') }}"
@@ -32,7 +29,6 @@
                     <input type="hidden" name="project_type_id" id="hidden_project_type_id"
                         value="{{ request('project_type_id') }}">
 
-                    <!-- ช่องค้นหา -->
                     <div class="relative w-full sm:w-80">
                         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                             <i class="fa-solid fa-magnifying-glass text-gray-400 dark:text-gray-500"></i>
@@ -42,7 +38,6 @@
                             placeholder="ค้นหาโครงงานศิษย์เก่า...">
                     </div>
 
-                    <!-- Dropdown ตัวกรองประเภทโครงงาน -->
                     <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                         @php
                             $selectedTypeName = 'ทุกประเภทโครงงาน';
@@ -90,7 +85,6 @@
                 </form>
             </div>
 
-            <!-- Windows Explorer Style View -->
             <div class="p-6 bg-white dark:bg-gray-800 rounded-b-xl min-h-[50vh]">
 
                 <style>
@@ -103,7 +97,7 @@
                     }
                 </style>
 
-                @if (empty($groupedProjects))
+                @if (empty($groupedProjects) || count($groupedProjects) === 0)
                     <div class="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400">
                         <i class="fa-regular fa-folder-open text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
                         <p>โฟลเดอร์ว่างเปล่า - ไม่พบข้อมูลโครงงาน</p>
@@ -136,7 +130,6 @@
 
                                             <div
                                                 class="absolute top-1 right-1 opacity-0 group-hover/icon:opacity-100 transition-opacity flex flex-col gap-1 z-10">
-                                                <!-- ปุ่มแก้ไข -->
                                                 <button type="button" title="แก้ไข"
                                                     data-modal-target="editProjectModal"
                                                     data-modal-toggle="editProjectModal"
@@ -144,16 +137,15 @@
                                                     data-id="{{ $project->id }}" data-title="{{ $project->title }}"
                                                     data-keyword="{{ $project->keyword }}"
                                                     data-project_type_id="{{ $project->project_type_id }}"
-                                                    data-academic_year="{{ $project->projectGroup->ac_id ?? '' }}"
+                                                    data-academic_year="{{ $project->projectGroup?->ac_id ?? '' }}"
                                                     data-advisor_id="{{ $project->advisor_id }}"
-                                                    data-student_ids="{{ json_encode($project->projectGroup->group_members->pluck('s_id')->toArray() ?? []) }}"
-                                                    data-cover_file="{{ $project->files->first()?->cover_file ?? '' }}"
-                                                    data-abstract_file="{{ $project->files->first()?->abstract_file ?? '' }}"
-                                                    data-project_file="{{ $project->files->first()?->project_file ?? '' }}">
+                                                    data-student_ids="{{ json_encode($project->projectGroup?->group_members?->pluck('s_id')->toArray() ?? []) }}"
+                                                    data-cover_file="{{ $project->files?->first()?->cover_file ?? '' }}"
+                                                    data-abstract_file="{{ $project->files?->first()?->abstract_file ?? '' }}"
+                                                    data-project_file="{{ $project->files?->first()?->project_file ?? '' }}">
                                                     <i class="fa-solid fa-pen text-xs"></i>
                                                 </button>
 
-                                                <!-- ปุ่มลบ -->
                                                 <form action="{{ route('admin.alumni.project.delete', $project->id) }}"
                                                     method="POST" class="delete-form m-0"
                                                     onclick="event.stopPropagation();">
@@ -175,14 +167,14 @@
                                             <span
                                                 class="text-xs font-medium text-gray-800 dark:text-gray-200 line-clamp-2 w-full leading-tight"
                                                 title="{{ $project->title }}">
-                                                {{ $project->title }}
+                                                {{ $project->title ?? 'ไม่มีชื่อโครงงาน' }}
                                             </span>
 
                                             @if ($project->advisor)
                                                 <span
                                                     class="text-[10px] text-gray-400 dark:text-gray-500 mt-1 line-clamp-1 w-full"
-                                                    title="{{ $project->advisor->name }}">
-                                                    {{ $project->advisor->name }}
+                                                    title="{{ $project->advisor->name ?? '' }}">
+                                                    {{ $project->advisor->name ?? '' }}
                                                 </span>
                                             @endif
                                         </div>
@@ -202,7 +194,6 @@
         </div>
     </div>
 
-    <!-- ดึงไฟล์ Modal เข้ามาทำงาน -->
     @include('admin.alumni.project.partials.create')
     @include('admin.alumni.project.partials.edit')
 

@@ -235,6 +235,58 @@ class InvigilatorController extends Controller
     }
 
     // revision setting
+    // public function revisionIndex(Request $request)
+    // {
+    //     $advisor = Auth::guard('advisors')->user();
+
+    //     // 1) หาทุก invi_group_member_id ของอาจารย์
+    //     $inviGroupIds = InviGroupMember::where('a_id', $advisor->id)->pluck('id');
+
+    //     $examInvi = ExamInviMember::whereIn('invi_member_id', $inviGroupIds)
+    //         ->firstOrFail();
+    //     // dd($examInvi);
+
+    //     // 2) หา submission_id ที่อาจารย์นี้เป็น invigilator
+    //     $submissionIds = ExamInviMember::whereIn('invi_member_id', $inviGroupIds)
+    //         ->where('role', 2)
+    //         ->pluck('submission_id');
+    //     // dd($submissionIds);
+
+    //     $search = trim((string) $request->input('search', ''));
+
+    //     $query = Revision::whereIn('submission_id', $submissionIds)
+    //         ->whereHas('exam_submission', fn($q) => $q->where('status', 0));
+
+    //     if ($search !== '') {
+    //         $query->whereHas(
+    //             'exam_submission.propose',
+    //             fn($q) =>
+    //             $q->where('title', 'like', "%{$search}%")
+    //         );
+    //     }
+
+    //     $revisions = $query
+    //         ->with([
+    //             // ดึง myApproval ของ “อาจารย์คนนี้” เท่านั้น
+    //             'myApproval' => fn($q) => $q
+    //                 ->whereHas(
+    //                     'exam_invi_member',
+    //                     fn($qq) =>
+    //                     $qq->whereIn('invi_member_id', $inviGroupIds)
+    //                         ->where('role', 2)
+    //                 )
+    //                 ->latest('id') // กันกรณีมีหลายแถว เผื่อแก้ไขซ้ำ
+    //                 ->limit(1),
+    //             // เผื่อใช้ชื่อโครงงานใน view
+    //             'exam_submission.propose:id,title',
+    //         ])
+    //         ->orderByDesc('updated_at')
+    //         ->paginate(10)
+    //         ->appends(['search' => $search]);
+
+    //     return view('invigilator.revision.index', compact('revisions', 'search'));
+    // }
+
     public function revisionIndex(Request $request)
     {
         $advisor = Auth::guard('advisors')->user();
@@ -242,27 +294,47 @@ class InvigilatorController extends Controller
         // 1) หาทุก invi_group_member_id ของอาจารย์
         $inviGroupIds = InviGroupMember::where('a_id', $advisor->id)->pluck('id');
 
-        $examInvi = ExamInviMember::whereIn('invi_member_id', $inviGroupIds)
-            ->firstOrFail();
-        // dd($examInvi);
+        // (เอา firstOrFail ออกเพื่อป้องกันหน้าเว็บพัง Error 404 ในกรณีกรรมการยังไม่เคยถูกจัดลงตารางสอบเลย)
+        // $examInvi = ExamInviMember::whereIn('invi_member_id', $inviGroupIds)->firstOrFail();
 
-        // 2) หา submission_id ที่อาจารย์นี้เป็น invigilator
+        // 2) หา submission_id ที่อาจารย์นี้เป็น invigilator (role = 2)
         $submissionIds = ExamInviMember::whereIn('invi_member_id', $inviGroupIds)
             ->where('role', 2)
             ->pluck('submission_id');
-        // dd($submissionIds);
 
         $search = trim((string) $request->input('search', ''));
+        $status = $request->input('status'); // รับค่า status จาก dropdown
 
         $query = Revision::whereIn('submission_id', $submissionIds)
             ->whereHas('exam_submission', fn($q) => $q->where('status', 0));
 
+        // กรองด้วยชื่อโครงงาน
         if ($search !== '') {
             $query->whereHas(
                 'exam_submission.propose',
                 fn($q) =>
                 $q->where('title', 'like', "%{$search}%")
             );
+        }
+
+        // กรองด้วยสถานะการพิจารณา (ของกรรมการท่านนี้)
+        if ($status !== null && $status !== '') {
+            if ($status == '2') {
+                // กรณี "รอพิจารณา" คือยังไม่มี approval หรือ มีแต่ status = 2
+                $query->where(function ($q) use ($inviGroupIds) {
+                    $q->doesntHave('myApproval')
+                        ->orWhereHas('myApproval', function ($qq) use ($inviGroupIds) {
+                            $qq->where('status', 2)
+                                ->whereHas('exam_invi_member', fn($qqq) => $qqq->whereIn('invi_member_id', $inviGroupIds)->where('role', 2));
+                        });
+                });
+            } else {
+                // กรณี อนุมัติ (1) หรือ ไม่อนุมัติ (3) ต้องมี Approval และ status ตรงกัน
+                $query->whereHas('myApproval', function ($q) use ($status, $inviGroupIds) {
+                    $q->where('status', $status)
+                        ->whereHas('exam_invi_member', fn($qq) => $qq->whereIn('invi_member_id', $inviGroupIds)->where('role', 2));
+                });
+            }
         }
 
         $revisions = $query
@@ -277,12 +349,13 @@ class InvigilatorController extends Controller
                     )
                     ->latest('id') // กันกรณีมีหลายแถว เผื่อแก้ไขซ้ำ
                     ->limit(1),
-                // เผื่อใช้ชื่อโครงงานใน view
+                // เผื่อใช้ชื่อโครงงานใน view และโหลด exam_type มาด้วยเพื่อป้องกัน N+1 Query
                 'exam_submission.propose:id,title',
+                'exam_submission.exam_type:id,name',
             ])
             ->orderByDesc('updated_at')
             ->paginate(10)
-            ->appends(['search' => $search]);
+            ->appends(['search' => $search, 'status' => $status]); // แปะ status เข้า pagination ด้วย
 
         return view('invigilator.revision.index', compact('revisions', 'search'));
     }
