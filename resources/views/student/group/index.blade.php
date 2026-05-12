@@ -1,151 +1,153 @@
 <x-app-layout>
-    <div class="mt-16 py-8">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-gray-50 dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg rounded-lg">
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-500 dark:text-gray-400">รายชื่อนักศึกษาทั้งหมด</h3>
-                    <div
-                        class="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-end pb-4 mt-2">
-                        <div>
-                            @if ($hasGroup)
-                                <span
-                                    class="text-gray-500 bg-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center cursor-not-allowed">
-                                    คุณมีกลุ่มแล้ว
-                                </span>
-                                <a href="{{ route('student.group.edit', ['group' => $groupId]) }}"
-                                    class="ml-4 text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-500 dark:hover:bg-green-600 dark:focus:ring-green-800">
-                                    แก้ไข
-                                </a>
-                            @else
-                                <a href="{{ route('student.group.create') }}"
-                                    class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800">
-                                    สร้าง
-                                </a>
-                            @endif
-                        </div>
-                        {{-- <div>
-                                <a href="{{ route('student.group.create') }}"
-                        class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-500 dark:hover:bg-blue-600 dark:focus:ring-blue-800
-                        {{ Auth::guard('students')->user()->group_id !== null ? 'pointer-events-none opacity-50' : '' }}">
-                        Create
-                        </a>
-                    </div> --}}
-                    </div>
+    <div class="p-6 max-w-7xl mx-auto mt-4">
 
-                    <div class="relative overflow-x-auto shadow-md sm:rounded-lg rounded-lg mt-2">
-                        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                            <thead
-                                class="text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                                <tr>
-                                    {{-- <th scope="col" class="px-6 py-3">
-                                        No.
-                                    </th> --}}
-                                    <th scope="col" class="px-6 py-3">
-                                        รหัสนักศึกษา
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        ชื่อ
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        นามสกุล
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        สาขา
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        สถานะ
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($Student as $user)
-                                    <tr
-                                        class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div>
+                <h1
+                    class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-users text-orange-500"></i> รายชื่อนักศึกษาทั้งหมด
+                </h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 transition-colors duration-200">
+                    ข้อมูลรายชื่อนักศึกษาและจัดการกลุ่มโครงงานของคุณ
+                </p>
+            </div>
 
-                                        {{-- <th scope="row"
-                                            class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                            {{ $loop->iteration }}
-                                </th> --}}
-                                        <td class="px-6 py-4">
-                                            {{ $user->s_id }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            {{ $user->s_fname }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            {{ $user->s_lname }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            {{ $user->major->m_name }}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            @if ($user->status === 'active')
-                                                <span
-                                                    class="px-2 py-1 text-xs text-green-700 bg-green-100 rounded">
-                                                    ปกติ
-                                                </span>
-                                            @elseif ($user->status === 'graduated')
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 rounded bg-gray-100 text-gray-700">
-                                                    จบการศึกษา
-                                                </span>
-                                            @else
-                                                <span
-                                                    class="px-2 inline-flex text-xs leading-5 rounded bg-red-100 text-red-700">
-                                                    ไม่ทราบสถานะ
-                                                </span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td class="px-5 py-4">
-                                            ไม่พบข้อมูลนักศึกษา
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="mt-4">
-                        {{ $Student->links() }}
-                    </div>
-                </div>
+            <div class="flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
+                @if ($hasGroup)
+                    <span
+                        class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl text-sm font-bold bg-gray-100 text-gray-500 border border-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 cursor-not-allowed w-full sm:w-auto shadow-sm">
+                        <i class="fa-solid fa-check-circle mr-2"></i> คุณมีกลุ่มแล้ว
+                    </span>
+                    <a href="{{ route('student.group.edit', ['group' => $groupId]) }}"
+                        class="inline-flex items-center justify-center px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold rounded-xl shadow-sm transition-colors w-full sm:w-auto">
+                        <i class="fa-solid fa-pen-to-square mr-2"></i> แก้ไขกลุ่ม
+                    </a>
+                @else
+                    <a href="{{ route('student.group.create') }}"
+                        class="inline-flex items-center justify-center px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold rounded-xl shadow-sm transition-colors w-full sm:w-auto">
+                        <i class="fa-solid fa-user-plus mr-2"></i> สร้างกลุ่ม
+                    </a>
+                @endif
             </div>
         </div>
+
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-200 overflow-hidden">
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-600 dark:text-gray-400 transition-colors duration-200">
+                    <thead
+                        class="text-xs text-gray-500 uppercase bg-gray-50/50 dark:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700 transition-colors duration-200">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 font-semibold w-32">รหัสนักศึกษา</th>
+                            <th scope="col" class="px-6 py-4 font-semibold min-w-[150px]">ชื่อ</th>
+                            <th scope="col" class="px-6 py-4 font-semibold min-w-[150px]">นามสกุล</th>
+                            <th scope="col" class="px-6 py-4 font-semibold">สาขา</th>
+                            <th scope="col" class="px-6 py-4 font-semibold text-center w-32">สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50 dark:divide-gray-700">
+                        @forelse ($Student as $user)
+                            <tr
+                                class="hover:bg-orange-50/50 dark:hover:bg-gray-700/50 transition-colors duration-200 group">
+
+                                <td class="px-6 py-5 font-bold text-gray-900 dark:text-white">
+                                    {{ $user->s_id }}
+                                </td>
+
+                                <td class="px-6 py-5 text-gray-800 dark:text-gray-200 font-medium">
+                                    {{ $user->s_fname }}
+                                </td>
+
+                                <td class="px-6 py-5 text-gray-800 dark:text-gray-200 font-medium">
+                                    {{ $user->s_lname }}
+                                </td>
+
+                                <td class="px-6 py-5 text-gray-600 dark:text-gray-400">
+                                    {{ $user->major->m_name ?? '-' }}
+                                </td>
+
+                                <td class="px-6 py-5 text-center">
+                                    @if ($user->status === 'active')
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20 dark:text-emerald-400 whitespace-nowrap">
+                                            <i class="fa-solid fa-user-check mr-1.5 opacity-70"></i> ปกติ
+                                        </span>
+                                    @elseif ($user->status === 'graduated')
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-gray-100 text-gray-600 border border-gray-200 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 whitespace-nowrap">
+                                            <i class="fa-solid fa-graduation-cap mr-1.5 opacity-70"></i> จบการศึกษา
+                                        </span>
+                                    @else
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-500/10 dark:border-rose-500/20 dark:text-rose-400 whitespace-nowrap">
+                                            <i class="fa-solid fa-circle-question mr-1.5 opacity-70"></i> ไม่ทราบสถานะ
+                                        </span>
+                                    @endif
+                                </td>
+
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-16 text-center text-gray-500 dark:text-gray-400">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <i
+                                            class="fa-solid fa-users-slash text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                                        <p class="text-base font-medium">ไม่พบข้อมูลนักศึกษา</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            @if ($Student->hasPages())
+                <div
+                    class="p-4 border-t border-gray-100 bg-gray-50 dark:border-gray-700 dark:bg-gray-800 transition-colors duration-200 rounded-b-xl">
+                    {{ $Student->links() }}
+                </div>
+            @endif
+
+        </div>
     </div>
+
+    @push('scripts')
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // แจ้งเตือนความสำเร็จ
+                @if (session('success'))
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'สำเร็จ',
+                        text: "{{ session('success') }}",
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#f97316'
+                    });
+                @endif
+
+                // แจ้งเตือนข้อผิดพลาด (Validation)
+                @if ($errors->any())
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: "{{ $errors->first() }}",
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#f97316'
+                    });
+                @endif
+
+                // แจ้งเตือนข้อผิดพลาด (Session Error)
+                @if (session('error'))
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'แจ้งเตือน',
+                        text: "{{ session('error') }}",
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#f97316'
+                    });
+                @endif
+            });
+        </script>
+    @endpush
 </x-app-layout>
-
-<script>
-    // ตรวจสอบ success message
-    @if (session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'สำเร็จ',
-            // timmer: 2000,
-            text: "{{ session('success') }}",
-            confirmButtonText: 'ตกลง'
-        });
-    @endif
-
-    // ตรวจสอบ validation errors (แสดงข้อความแรก)
-    @if ($errors->any())
-        Swal.fire({
-            icon: 'error',
-            title: 'เกิดข้อผิดพลาด',
-            // timmer: 2000,
-            text: "{{ $errors->first() }}",
-            confirmButtonText: 'ตกลง'
-        });
-    @endif
-
-    @if (session('error'))
-        Swal.fire({
-            icon: 'warning',
-            title: 'แจ้งเตือน',
-            text: "{{ session('error') }}",
-            confirmButtonText: 'ตกลง'
-        });
-    @endif
-</script>
