@@ -5,7 +5,7 @@
             <div>
                 <h1
                     class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200 flex items-center gap-2">
-                    <i class="fa-solid fa-clipboard-check text-orange-500"></i> พิจารณาข้อเสนอโครงงาน
+                    <i class="fa-solid fa-file-signature text-orange-500"></i> พิจารณาข้อเสนอโครงงาน
                 </h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     ตรวจสอบรายละเอียดและดำเนินการบันทึกผลการพิจารณาหัวข้อ

@@ -165,7 +165,7 @@
                                             <button type="button" title="พิจารณาอนุมัติ"
                                                 onclick="window.location.href='{{ route('advisor.propose.approveFormView', $proposal->id) }}'"
                                                 class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gray-50 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600 border border-gray-200 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-emerald-400 transition-colors">
-                                                <i class="fa-solid fa-clipboard-check"></i>
+                                                <i class="fa-solid fa-file-signature"></i>
                                             </button>
                                         @else
                                             <button type="button" title="รายละเอียด"
