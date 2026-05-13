@@ -35,21 +35,35 @@ class StudentController extends Controller
 {
 
     // Start Group Setting
-    public function groupIndex()
+    public function groupIndex(Request $request)
     {
         // ดึงข้อมูลผู้ใช้ที่ล็อกอินอยู่
         $stdLogin = Auth::guard('students')->user();
 
-        // กรองข้อมูล Student ตาม m_id และ ac_id ของผู้ที่ล็อกอิน
-        $Student = Student::orderBy('id', 'asc')
-            ->paginate(10);
+        // รับค่าคำค้นหาจากช่อง Search
+        $search = $request->input('search');
+
+        // กรองข้อมูล Student ตาม m_id ของผู้ที่ล็อกอิน (สาขาเดียวกัน)
+        $Student = Student::where('m_id', $stdLogin->m_id)
+            ->where('status', 'active') // นักศึกษาที่มีสถานะ active
+            ->when($search, function ($query, $search) {
+                // ถ้าระบุคำค้นหา ให้หาจาก รหัสนักศึกษา, ชื่อ หรือ นามสกุล
+                return $query->where(function ($q) use ($search) {
+                    $q->where('s_id', 'LIKE', "%{$search}%")
+                        ->orWhere('s_fname', 'LIKE', "%{$search}%")
+                        ->orWhere('s_lname', 'LIKE', "%{$search}%");
+                });
+            })
+            ->orderBy('s_id', 'asc') // เรียงตามรหัสนักศึกษาจะดูเป็นระเบียบกว่าเรียงตาม id (PK)
+            ->paginate(10)
+            ->withQueryString(); // คำสั่งนี้ช่วยให้ตอนกดเปลี่ยนหน้า Pagiantion (หน้า 2, 3) ค่า Search จะไม่หายไป
 
         // ตรวจสอบว่า นักศึกษาที่ล็อกอินอยู่ เป็นสมาชิกกลุ่มหรือยัง
         $groupMember = GroupMember::where('s_id', $stdLogin->id)->first();
         $hasGroup  = $groupMember !== null;
         $groupId   = $groupMember->group_id ?? null;
 
-        return view('student.group.index', compact('Student', 'stdLogin', 'hasGroup', 'groupId'));
+        return view('student.group.index', compact('Student', 'stdLogin', 'hasGroup', 'groupId', 'search'));
     }
 
     public function groupCreate(Request $request)
