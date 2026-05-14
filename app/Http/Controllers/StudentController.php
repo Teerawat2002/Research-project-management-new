@@ -852,6 +852,7 @@ class StudentController extends Controller
         return view('student.revision.show', compact('revision', 'invigilators'));
     }
 
+    // Upload Setting
     public function uploadIndex()
     {
         $student = auth('students')->user(); // ใช้ guard 'students'
@@ -925,8 +926,8 @@ class StudentController extends Controller
 
         try {
             /* =========================
-         * 1. สร้าง upload
-         * ========================= */
+             * 1. สร้าง upload
+             * ========================= */
             $upload = Upload::create([
                 'revision_id' => $revision->id,
                 'keyword' => $validated['keyword'],
@@ -934,8 +935,8 @@ class StudentController extends Controller
             ]);
 
             /* =========================
-         * 2. Upload files
-         * ========================= */
+             * 2. Upload files
+             * ========================= */
             $dir = "uploads/upload/{$upload->id}";
             $ts = now()->format('Ymd');
 
@@ -955,8 +956,8 @@ class StudentController extends Controller
                 ->storeAs($dir, $coverName, 'public');
 
             /* =========================
-         * 3. บันทึก upload_files (polymorphic)
-         * ========================= */
+             * 3. บันทึก upload_files (polymorphic)
+             * ========================= */
             UploadFile::create([
                 'fileable_id'   => $upload->id,
                 'fileable_type' => Upload::class,
@@ -967,10 +968,10 @@ class StudentController extends Controller
 
             DB::commit();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'บันทึกข้อมูลไฟล์โครงงานเรียบร้อยแล้ว!',
-            ]);
+            // Redirect กลับไปหน้า index เมื่อสำเร็จ
+            return redirect()
+                ->route('student.upload.index')
+                ->with('success', 'บันทึกข้อมูลไฟล์โครงงานเรียบร้อยแล้ว!');
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -979,10 +980,10 @@ class StudentController extends Controller
                 Storage::disk('public')->deleteDirectory("uploads/upload/{$upload->id}");
             }
 
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 500);
+            // Redirect กลับไปหน้าเดิมพร้อมข้อความ Error
+            return back()
+                ->withInput()
+                ->with('error', 'เกิดข้อผิดพลาด: ' . $e->getMessage());
         }
     }
 
@@ -1205,9 +1206,9 @@ class StudentController extends Controller
 
         $file->save();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'อัปเดตข้อมูลโครงงานเรียบร้อยแล้ว!',
-        ]);
+        // Redirect กลับไปหน้า index เมื่ออัปโหลดไฟล์ใหม่สำเร็จ
+        return redirect()
+            ->route('student.upload.index')
+            ->with('success', 'อัปเดตข้อมูลไฟล์โครงงานเรียบร้อยแล้ว!');
     }
 }

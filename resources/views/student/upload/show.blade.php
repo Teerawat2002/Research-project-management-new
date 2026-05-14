@@ -1,144 +1,236 @@
 <x-app-layout>
-    <div class="mt-16 py-8" x-data="{ showPdf: false, pdfUrl: '', pdfTitle: '', showImg: false, imgUrl: '' }">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden">
-                <div class="p-8">
-                    <h2 class="text-3xl font-bold mb-6 text-blue-700">ข้อมูลการอนุมัติไฟล์โครงงานวิจัย</h2>
+    <div class="p-6 max-w-6xl mx-auto mt-4" x-data="{ showPdf: false, pdfUrl: '', pdfTitle: '', showImg: false, imgUrl: '' }">
 
-                    {{-- ชื่อโครงงาน --}}
-                    <div class="mb-6">
-                        <div class="text-sm text-gray-600 dark:text-gray-300">ชื่อโครงงานวิจัย</div>
-                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
-                            {{ $propose->title ?? '-' }}
-                        </h3>
-                    </div>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <h1
+                    class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200 flex items-center gap-2">
+                    <i class="fa-solid fa-file-invoice text-orange-500"></i> รายละเอียดไฟล์โครงงานวิจัย
+                </h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 transition-colors duration-200">
+                    ข้อมูลและสถานะการตรวจสอบไฟล์โครงงานฉบับสมบูรณ์ของคุณ
+                </p>
+            </div>
 
-                    {{-- ปุ่มพรีวิวไฟล์ --}}
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                        <div>
-                            <div class="text-sm text-gray-600 dark:text-gray-300 mb-2">หน้าปก (รูปภาพ)</div>
-                            @if ($coverPreviewUrl)
-                                <img src="{{ $coverPreviewUrl }}" alt="หน้าปกโครงงาน"
-                                    class="max-h-40 rounded-md border cursor-zoom-in"
-                                    @click="imgUrl='{{ $coverPreviewUrl }}'; showImg=true">
-                                <div class="text-xs text-gray-500 mt-1">คลิกที่รูปเพื่อขยาย</div>
-                            @else
-                                <span class="text-gray-400">-</span>
-                            @endif
-                        </div>
+            <a href="{{ route('student.upload.index') }}"
+                class="inline-flex items-center justify-center px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors text-sm font-medium w-full md:w-auto">
+                <i class="fa-solid fa-arrow-left mr-2"></i> ย้อนกลับ
+            </a>
+        </div>
 
-                        <div>
-                            <div class="text-sm text-gray-600 dark:text-gray-300 mb-2">บทคัดย่อ (PDF)</div>
-                            @if ($file?->abstract_file)
-                                <button type="button"
-                                    @click="pdfUrl='{{ route('student.upload.preview', ['upload' => $upload->id, 'type' => 'abstract']) }}' + '?v=' + Date.now();
-                        pdfTitle='บทคัดย่อ'; showPdf=true"
-                                    class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5">
-                                    <i class="fa-solid fa-eye"></i> เปิดดู
-                                </button>
-                            @else
-                                <span class="text-gray-400">-</span>
-                            @endif
-                        </div>
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 transition-colors duration-200 overflow-hidden">
 
-                        <div>
-                            <div class="text-sm text-gray-600 dark:text-gray-300 mb-2">ไฟล์โครงงาน (PDF)</div>
-                            @if ($file?->project_file)
-                                <button type="button"
-                                    @click="pdfUrl='{{ route('student.upload.preview', ['upload' => $upload->id, 'type' => 'project']) }}' + '?v=' + Date.now();
-                        pdfTitle='ไฟล์โครงงาน'; showPdf=true"
-                                    class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5">
-                                    <i class="fa-solid fa-eye"></i> เปิดดู
-                                </button>
-                            @else
-                                <span class="text-gray-400">-</span>
-                            @endif
-                        </div>
-                    </div>
+            <div class="p-6 md:p-8">
 
-                    <div class="mb-6">
-                        <x-input-default-label for="keyword" :value="__('คำสำคัญ')" />
+                <div
+                    class="bg-orange-50 dark:bg-orange-500/10 border border-orange-100 dark:border-orange-500/20 p-5 rounded-xl mb-8">
+                    <h3 class="text-sm font-bold text-orange-800 dark:text-orange-400 mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-book-open"></i> ชื่อโครงงานวิจัย
+                    </h3>
+                    <p class="text-base font-semibold text-gray-900 dark:text-white pl-6">
+                        {{ $propose->title ?? '-' }}
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+
+                    <div class="lg:col-span-2 space-y-6">
+
                         <div
-                            class="mt-1 w-full rounded-md border border-gray-300 bg-gray-100 text-gray-800 px-3 py-2">
-                            {{ $upload->keyword ?? '-' }}
+                            class="bg-gray-50 dark:bg-gray-900/50 p-5 rounded-xl border border-gray-200 dark:border-gray-700">
+                            <h3
+                                class="text-sm font-bold text-gray-800 dark:text-gray-200 tracking-wide flex items-center gap-2 mb-4 border-b border-gray-200 dark:border-gray-700 pb-3">
+                                <i class="fa-solid fa-folder-open text-blue-500"></i> ไฟล์ที่อัปโหลด
+                            </h3>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <div>
+                                    <div
+                                        class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                                        หน้าปก (รูปภาพ)</div>
+                                    @if ($coverPreviewUrl)
+                                        <div class="relative group cursor-zoom-in"
+                                            @click="imgUrl='{{ $coverPreviewUrl }}'; showImg=true">
+                                            <img src="{{ $coverPreviewUrl }}" alt="หน้าปกโครงงาน"
+                                                class="w-full max-h-48 object-cover rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm transition-transform duration-300 group-hover:scale-[1.02]">
+                                            <div
+                                                class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                                                <i class="fa-solid fa-magnifying-glass-plus text-white text-2xl"></i>
+                                            </div>
+                                        </div>
+                                        <div class="text-xs font-medium text-gray-500 mt-2 pl-1">คลิกที่รูปเพื่อขยาย
+                                        </div>
+                                    @else
+                                        <div
+                                            class="h-24 flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-400">
+                                            <span class="text-sm font-medium">ไม่มีไฟล์หน้าปก</span>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div>
+                                        <div
+                                            class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                                            บทคัดย่อ (PDF)</div>
+                                        @if ($file?->abstract_file)
+                                            <button type="button"
+                                                @click="pdfUrl='{{ route('student.upload.preview', ['upload' => $upload->id, 'type' => 'abstract']) }}' + '?v=' + Date.now(); pdfTitle='บทคัดย่อ'; showPdf=true"
+                                                class="inline-flex items-center gap-3 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:border-blue-200 dark:hover:border-blue-500/30 transition-all shadow-sm group w-full text-left">
+                                                <i
+                                                    class="fa-solid fa-file-pdf text-rose-500 text-xl group-hover:scale-110 transition-transform"></i>
+                                                <span
+                                                    class="text-sm font-semibold text-gray-700 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">เปิดดูบทคัดย่อ</span>
+                                            </button>
+                                        @else
+                                            <div
+                                                class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-400 text-sm font-medium">
+                                                ไม่มีไฟล์บทคัดย่อ
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <div>
+                                        <div
+                                            class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                                            ไฟล์โครงงาน (PDF)</div>
+                                        @if ($file?->project_file)
+                                            <button type="button"
+                                                @click="pdfUrl='{{ route('student.upload.preview', ['upload' => $upload->id, 'type' => 'project']) }}' + '?v=' + Date.now(); pdfTitle='ไฟล์โครงงานฉบับสมบูรณ์'; showPdf=true"
+                                                class="inline-flex items-center gap-3 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:border-blue-200 dark:hover:border-blue-500/30 transition-all shadow-sm group w-full text-left">
+                                                <i
+                                                    class="fa-solid fa-file-pdf text-rose-500 text-xl group-hover:scale-110 transition-transform"></i>
+                                                <span
+                                                    class="text-sm font-semibold text-gray-700 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">เปิดดูไฟล์โครงงาน</span>
+                                            </button>
+                                        @else
+                                            <div
+                                                class="px-4 py-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-400 text-sm font-medium">
+                                                ไม่มีไฟล์โครงงาน
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-bold text-gray-800 dark:text-gray-200 tracking-wide flex items-center gap-2 mb-2">
+                                <i class="fa-solid fa-key text-orange-500"></i> คำสำคัญ (Keywords)
+                            </label>
+                            <div
+                                class="w-full px-4 py-3 text-sm text-gray-900 bg-gray-50 border border-gray-200 rounded-lg dark:bg-gray-900 dark:border-gray-700 dark:text-white">
+                                {{ $upload->keyword ?? '-' }}
+                            </div>
+                        </div>
+
+                        <div class="text-xs font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left"></i> อัปเดตข้อมูลล่าสุด:
+                            <span class="text-gray-700 dark:text-gray-300">
+                                {{ optional($upload->updated_at)->timezone('Asia/Bangkok')->format('d/m/Y • H:i') ?? '-' }}
+                                น.
+                            </span>
+                        </div>
+
                     </div>
 
-                    {{-- สถานะการอนุมัติ --}}
-                    @php $status = (int) ($upload->status ?? 1); @endphp
-                    <div class="mb-2 text-sm text-gray-600 dark:text-gray-300">สถานะการอนุมัติ</div>
-                    <div class="mb-6">
-                        @switch($status)
-                            @case(0)
-                                <span class="px-3 py-1 text-sm rounded-md bg-green-100 text-green-800">อนุมัติแล้ว</span>
-                            @break
+                    <div class="lg:col-span-1 space-y-6 lg:sticky lg:top-6">
 
-                            @case(1)
-                                <span class="px-3 py-1 text-sm rounded-md bg-yellow-100 text-yellow-800">รออนุมัติ</span>
-                            @break
+                        <div
+                            class="bg-gray-50 dark:bg-gray-900/50 p-5 rounded-xl border border-gray-200 dark:border-gray-700">
+                            <h3
+                                class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                                สถานะการอนุมัติล่าสุด</h3>
+                            @php $status = (int) ($upload->status ?? 1); @endphp
+                            <div>
+                                @switch($status)
+                                    @case(0)
+                                        <span
+                                            class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 w-full justify-center">
+                                            <i class="fa-solid fa-check-double mr-2"></i> อนุมัติแล้ว
+                                        </span>
+                                    @break
 
-                            @case(2)
-                                <span class="px-3 py-1 text-sm rounded-md bg-red-100 text-red-800">ปฏิเสธ</span>
-                            @break
+                                    @case(1)
+                                        <span
+                                            class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 w-full justify-center">
+                                            <i class="fa-solid fa-hourglass-half mr-2"></i> รอการตรวจสอบ
+                                        </span>
+                                    @break
 
-                            @default
-                                <span class="px-3 py-1 text-sm rounded-md bg-gray-100 text-gray-800">ไม่ทราบสถานะ</span>
-                        @endswitch
-                    </div>
+                                    @case(2)
+                                        <span
+                                            class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400 w-full justify-center">
+                                            <i class="fa-solid fa-xmark mr-2"></i> ถูกปฏิเสธ / ส่งแก้ไข
+                                        </span>
+                                    @break
 
-                    <div class="mb-2">
-                        <label for="comment" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            ข้อเสนอแนะ/เหตุผล
-                        </label>
-                        <textarea id="comment" name="comment" rows="4"
-                            class="mt-1 block w-full rounded-md border border-gray-300 bg-gray-100 text-gray-800" readonly>{{ $upload->comment ?? '-' }}</textarea>
-                    </div>
+                                    @default
+                                        <span
+                                            class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-bold bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 w-full justify-center">
+                                            ไม่ทราบสถานะ
+                                        </span>
+                                @endswitch
+                            </div>
 
-                    {{-- เวลาอัปเดตล่าสุด --}}
-                    <div class="text-sm text-gray-600 dark:text-gray-300">
-                        อัปเดตล่าสุด:
-                        <span class="font-medium text-gray-500">
-                            {{ optional($upload->updated_at)->format('d/m/Y') ?? '-' }}
-                        </span>
-                    </div>
+                            @if (!empty($upload->comment))
+                                <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                    <label
+                                        class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                        <i class="fa-solid fa-comment-dots text-orange-500"></i> ข้อเสนอแนะ/เหตุผล
+                                    </label>
+                                    <div
+                                        class="w-full px-3 py-2 text-sm text-gray-700 bg-white border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 whitespace-pre-wrap">
+                                        {{ $upload->comment ?? '-' }}</div>
+                                </div>
+                            @endif
+                        </div>
 
-                    {{-- ปุ่มย้อนกลับ --}}
-                    <div class="flex justify-end mt-6">
-                        <a href="{{ route('student.upload.index') }}"
-                            class="inline-flex items-center bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-2 rounded-lg shadow transition">
-                            ย้อนกลับ
-                        </a>
                     </div>
                 </div>
+
             </div>
         </div>
 
-        <!-- MODAL Image Preview (รูปปก) -->
-        <div :class="{ 'hidden': !showImg }" x-transition.opacity
-            class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-            <div class="bg-white rounded-xl overflow-hidden w-full max-w-4xl shadow-lg">
-                <div class="flex justify-between items-center bg-gray-800 text-white px-6 py-3">
-                    <h2 class="font-bold text-lg">หน้าปก</h2>
-                    <button @click="showImg = false"
-                        class="text-white hover:text-gray-200 text-2xl font-bold">&times;</button>
-                </div>
-                <div class="p-4">
-                    <img :src="imgUrl" alt="preview" class="max-h-[75vh] mx-auto">
-                </div>
-            </div>
-        </div>
-
-        <!-- MODAL PDF Preview -->
-        <div :class="{ 'hidden': !showPdf }" x-transition.opacity
-            class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-            <div class="bg-white rounded-xl overflow-hidden w-11/12 max-w-5xl h-[90%] flex flex-col shadow-lg">
-                <div class="flex justify-between items-center bg-blue-600 text-white px-6 py-3">
-                    <h2 class="font-bold text-lg" x-text="pdfTitle"></h2>
+        <div x-show="showPdf" x-transition.opacity style="display: none;"
+            class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+            <div @click.away="showPdf = false"
+                class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl">
+                <div class="flex justify-between items-center bg-blue-600 text-white px-6 py-4">
+                    <h2 class="font-bold text-lg flex items-center gap-2">
+                        <i class="fa-solid fa-file-pdf"></i> <span x-text="pdfTitle"></span>
+                    </h2>
                     <button @click="showPdf = false; pdfUrl=''"
-                        class="text-white hover:text-gray-200 text-2xl font-bold">&times;</button>
+                        class="text-white/80 hover:text-white transition-colors">
+                        <i class="fa-solid fa-xmark text-2xl"></i>
+                    </button>
                 </div>
-                <iframe :src="pdfUrl" class="flex-1 w-full" frameborder="0"></iframe>
+                <div class="flex-1 w-full bg-gray-100 dark:bg-gray-900">
+                    <iframe :src="pdfUrl" class="w-full h-full border-0" frameborder="0"></iframe>
+                </div>
             </div>
         </div>
+
+        <div x-show="showImg" x-transition.opacity style="display: none;"
+            class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div @click.away="showImg = false"
+                class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden w-full max-w-3xl shadow-2xl">
+                <div class="flex justify-between items-center bg-gray-900 text-white px-6 py-4">
+                    <h2 class="font-bold text-lg flex items-center gap-2">
+                        <i class="fa-solid fa-image"></i> หน้าปก
+                    </h2>
+                    <button @click="showImg = false" class="text-white/80 hover:text-white transition-colors">
+                        <i class="fa-solid fa-xmark text-2xl"></i>
+                    </button>
+                </div>
+                <div
+                    class="p-4 bg-gray-100 dark:bg-gray-900 flex justify-center items-center overflow-auto max-h-[80vh]">
+                    <img :src="imgUrl" alt="preview" class="max-w-full h-auto rounded-lg shadow-sm">
+                </div>
+            </div>
+        </div>
+
     </div>
 </x-app-layout>
