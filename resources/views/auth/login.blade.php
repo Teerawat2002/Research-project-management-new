@@ -151,7 +151,7 @@
             </div>
 
             <p class="text-center text-xs text-gray-500 dark:text-gray-400 mt-6 font-medium">
-                &copy; {{ date('Y') }} CSIT Phetchabun Rajabhat University. All rights reserved.
+                &copy; {{ date('Y') }} CS&IT Phetchabun Rajabhat University. All rights reserved.
             </p>
         </main>
     </div>
