@@ -349,7 +349,7 @@ Route::middleware([AdvisorIsAdmin::class . ':teacher', 'auth:advisors'])->group(
     });
 
     Route::prefix('teacher/propose')->name('teacher.propose.')->group(function () {
-        Route::get('index', [TeacherController::class, 'proposeIndex'])->name('proposeIndex');
+        Route::get('index', [TeacherController::class, 'proposeIndex'])->name('index');
         Route::get('show/{id}', [TeacherController::class, 'proposeShow'])->name('show');
     });
 });

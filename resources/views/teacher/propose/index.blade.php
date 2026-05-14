@@ -5,7 +5,7 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200">
-                    Project Status
+                    Project Tracking Status
                 </h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 transition-colors duration-200">
                     สถานะกลุ่มโครงงานและการเสนอหัวข้อ
@@ -19,20 +19,30 @@
 
             <div
                 class="p-5 border-b border-gray-50 dark:border-gray-700 bg-white dark:bg-gray-800 transition-colors duration-200">
-                <form method="GET" action="{{ route('teacher.propose.proposeIndex') }}" id="filterForm"
+                <form method="GET" action="{{ route('teacher.propose.index') }}" id="filterForm"
                     class="flex flex-col sm:flex-row justify-between items-center gap-4 w-full">
 
                     <!-- Hidden Input สำหรับเก็บค่าสถานะที่เลือก -->
                     <input type="hidden" name="status" id="hidden_status" value="{{ request('status') }}">
 
                     <!-- ส่วนค้นหาด้วยข้อความ -->
-                    <div class="relative w-full sm:w-96">
-                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                            <i class="fa-solid fa-magnifying-glass text-gray-400 dark:text-gray-500"></i>
+                    <div class="flex items-center gap-2 w-full sm:w-auto flex-1 max-w-md">
+
+                        <div class="relative w-full">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">
+                                <i class="fa-solid fa-magnifying-glass text-gray-400 dark:text-gray-500"></i>
+                            </div>
+                            <input type="text" name="search" id="table-search" value="{{ request('search') }}"
+                                class="block w-full py-2.5 pl-10 pr-4 text-sm text-gray-900 border border-gray-200 rounded-xl bg-gray-50 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white transition-colors duration-200"
+                                placeholder="ค้นหาชื่อโครงงาน, อาจารย์ที่ปรึกษา...">
                         </div>
-                        <input type="text" name="search" id="table-search" value="{{ request('search') }}"
-                            class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-200 rounded-xl bg-gray-50 focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500 transition-colors duration-200"
-                            placeholder="ค้นหาชื่อโครงงาน, อาจารย์ที่ปรึกษา... (กด Enter)">
+
+                        <button type="submit"
+                            class="px-5 py-2.5 text-sm font-medium text-white bg-orange-500 rounded-xl hover:bg-orange-600 shadow-sm transition-colors duration-200 shrink-0 flex items-center justify-center gap-2 focus:ring-2 focus:ring-orange-500/50 outline-none">
+                            <i class="fa-solid fa-search"></i>
+                            <span class="hidden md:inline">ค้นหา</span>
+                        </button>
+
                     </div>
 
                     <!-- ส่วน Dropdown สถานะ -->

@@ -161,25 +161,36 @@ class TeacherController extends Controller
 
 
     // Proposal Setting
-    public function proposeProject(Request $request)
+    public function proposeIndex(Request $request)
     {
         // สร้าง Query Builder ค้างไว้ พร้อมโหลด relations
         $query = Propose::with(['advisor', 'project_group']);
 
-        // รับค่า status
+        // รับค่าจาก Form
         $status = $request->input('status');
+        $search = $request->input('search');
 
-        // ตรวจสอบว่ามีการส่ง status มา และ ไม่เป็นค่าว่าง (รองรับ '0' ให้ทำงานได้)
-        // การใช้ isset หรือ !== null สำคัญมากเมื่อจัดการกับค่า '0'
+        // 1. ฟิลเตอร์ตาม "สถานะ" (รองรับค่า '0')
         if ($status !== null && $status !== '') {
-            // ใช้ whereHas เข้าไปเช็คใน Relation project_group (อิงจาก Model Propose)
             $query->whereHas('project_group', function ($q) use ($status) {
-                // เช็คว่าสถานะใน project_groups ตรงกับที่ผู้ใช้เลือก
                 $q->where('status', $status);
             });
         }
 
-        // ดึงข้อมูลพร้อมการแบ่งหน้า และแนบ Query String กลับไป
+        // 2. ฟิลเตอร์ตาม "คำค้นหา" (ค้นหาจากชื่อโครงงาน หรือ ชื่ออาจารย์)
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                // ค้นหาในชื่อโครงงาน (title)
+                $q->where('title', 'LIKE', "%{$search}%")
+                    // หรือค้นหาจากชื่ออาจารย์ที่ปรึกษา (relation: advisor)
+                    ->orWhereHas('advisor', function ($advQuery) use ($search) {
+                        $advQuery->where('a_fname', 'LIKE', "%{$search}%")
+                            ->orWhere('a_lname', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        // ดึงข้อมูลพร้อมการแบ่งหน้า และแนบ Query String กลับไป (เพื่อให้กดเปลี่ยนหน้าแล้วค่าค้นหาไม่หาย)
         $propose = $query->latest()->paginate(10)->withQueryString();
 
         return view('teacher.propose.index', compact('propose'));
@@ -382,21 +393,6 @@ class TeacherController extends Controller
             // ส่งข้อผิดพลาดไปที่ view
             return back()->withErrors(['error' => 'ไม่สามารถลบข้อมูลได้ อาจเกิดจากมีการใช้งานข้อมูลกลุ่มกรรมการในการจัดการสอบ!!']);
         }
-    }
-
-
-    public function proposeIndex()
-    {
-        $advisor = Auth::guard('advisors')->user();
-
-        // ดึงเฉพาะ Propose ที่ project_group.status != 0
-        $propose = Propose::whereHas('project_group', function ($query) {
-            $query->where('status', '<>', 0);
-        })
-            ->with('project_group')  // eager‐load ความสัมพันธ์
-            ->paginate(10);
-
-        return view('teacher.propose.index', compact('advisor', 'propose'));
     }
 
     public function proposeShow($id)

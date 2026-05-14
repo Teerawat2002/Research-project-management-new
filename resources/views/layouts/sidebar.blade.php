@@ -192,7 +192,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('teacher.propose.proposeIndex') }}"
+                            <a href="{{ route('teacher.propose.index') }}"
                                 class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors group 
                                 {{ request()->routeIs('teacher.propose.*') ? 'bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400' : 'text-gray-600 dark:text-gray-400 hover:bg-orange-50 dark:hover:bg-gray-800 hover:text-orange-600 dark:hover:text-orange-400' }}">
                                 <i
