@@ -214,7 +214,7 @@
                             </x-dropdown-link>
 
                             <x-dropdown-link :href="route('dashboard')">
-                                <i class="fa-solid fa-gauge-high w-5 text-center text-gray-400 mr-1"></i> ระบบสอบ
+                                <i class="fa-solid fa-file-pen w-5 text-center text-gray-400 mr-1"></i> ระบบสอบ
                             </x-dropdown-link>
 
                             <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
