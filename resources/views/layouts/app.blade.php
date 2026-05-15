@@ -18,7 +18,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <script>
-        // เช็ก Theme ทันทีที่โหลดหน้าเว็บ ป้องกันการกะพริบ (FOUC)
+        // เช็ก Theme ทันทีที่โหลดหน้าเว็บ
         if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia(
                 '(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
@@ -30,15 +30,17 @@
 
 <body
     class="font-sans text-gray-800 antialiased bg-gray-50 dark:bg-gray-900 dark:text-gray-200 transition-colors duration-200">
-    <div x-data="{ open: false }" class="flex min-h-screen flex-col">
 
-        <div x-show="open" x-transition.opacity @click="open = false"
-            class="fixed inset-0 z-30 bg-gray-900 bg-opacity-50 sm:hidden" aria-hidden="true">
+    <div x-data="{ sidebarOpen: window.innerWidth >= 640 }" @resize.window="if(window.innerWidth < 640) sidebarOpen = false"
+        class="flex min-h-screen flex-col">
+
+        <div x-show="sidebarOpen" x-transition.opacity @click="sidebarOpen = false"
+            class="fixed inset-0 z-30 bg-gray-900/50 sm:hidden backdrop-blur-sm" aria-hidden="true">
         </div>
 
         @include('layouts.sidebar')
 
-        <div class="flex-1 transition-all duration-200 ease-in-out sm:ml-64">
+        <div :class="sidebarOpen ? 'sm:ml-[260px]' : 'ml-0'" class="flex-1 transition-all duration-300 ease-in-out">
             @include('layouts.navigation')
 
             @isset($header)

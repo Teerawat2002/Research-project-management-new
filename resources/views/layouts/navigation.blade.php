@@ -1,30 +1,27 @@
+
+
+
 <nav
     class="sticky top-0 z-20 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 dark:bg-gray-900/80 dark:border-gray-800 transition-colors duration-200">
     <div class="px-4 py-3 lg:px-6">
         <div class="flex items-center justify-between">
 
-            <div class="flex items-center justify-start">
-                <button @click="open = !open"
-                    class="sm:hidden inline-flex items-center p-2 text-gray-500 rounded-lg hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-200 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700 mr-2 transition-colors">
-                    <i class="fa-solid fa-bars fa-lg"></i>
+            <div class="flex items-center justify-start gap-2 sm:gap-4">
+                <button @click="sidebarOpen = !sidebarOpen"
+                    class="inline-flex items-center p-2 text-gray-500 rounded-lg hover:text-orange-500 hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-200 dark:text-gray-400 dark:hover:text-orange-400 dark:hover:bg-gray-800 transition-colors">
+                    <i class="fa-solid fa-bars-staggered fa-lg"
+                        :class="sidebarOpen ? 'fa-bars-staggered' : 'fa-bars'"></i>
                 </button>
 
-                <div class="hidden sm:flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-2">
-                    <a href="{{ route('welcome') }}"
-                        class="hover:text-orange-500 dark:hover:text-orange-400 transition-colors">
-                        <i
-                            class="fa-solid fa-house text-gray-400 dark:text-gray-500 hover:text-orange-500 dark:hover:text-orange-400 transition-colors"></i>
-                    </a>
-                    <span>/</span>
+                <div
+                    class="hidden sm:flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-2 border-l border-gray-200 dark:border-gray-700 pl-4">
                     <span class="font-medium text-gray-800 dark:text-gray-200">
-                        {{-- ดึงค่า title จาก Route ถ้าไม่มีให้ใช้คำว่า 'จัดการข้อมูล' แทน --}}
                         {{ request()->route('title') ?? 'จัดการข้อมูล' }}
                     </span>
                 </div>
             </div>
 
             <div class="flex items-center space-x-4">
-
                 <button id="theme-toggle" type="button"
                     class="text-gray-400 hover:text-orange-500 dark:text-gray-400 dark:hover:text-orange-400 transition-colors focus:outline-none rounded-lg p-2.5">
                     <i id="theme-toggle-dark-icon" class="fa-solid fa-moon fa-lg hidden"></i>
