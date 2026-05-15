@@ -1,6 +1,3 @@
-
-
-
 <nav
     class="sticky top-0 z-20 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 dark:bg-gray-900/80 dark:border-gray-800 transition-colors duration-200">
     <div class="px-4 py-3 lg:px-6">

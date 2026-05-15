@@ -31,8 +31,10 @@
 <body
     class="font-sans text-gray-800 antialiased bg-gray-50 dark:bg-gray-900 dark:text-gray-200 transition-colors duration-200">
 
-    <div x-data="{ sidebarOpen: window.innerWidth >= 640 }" @resize.window="if(window.innerWidth < 640) sidebarOpen = false"
-        class="flex min-h-screen flex-col">
+    <div x-data="{
+        sidebarOpen: window.innerWidth >= 640 ? localStorage.getItem('sidebarOpen') !== 'false' : false
+    }" x-init="$watch('sidebarOpen', value => { if (window.innerWidth >= 640) localStorage.setItem('sidebarOpen', value) })"
+        @resize.window="if(window.innerWidth < 640) sidebarOpen = false" class="flex min-h-screen flex-col">
 
         <div x-show="sidebarOpen" x-transition.opacity @click="sidebarOpen = false"
             class="fixed inset-0 z-30 bg-gray-900/50 sm:hidden backdrop-blur-sm" aria-hidden="true">
