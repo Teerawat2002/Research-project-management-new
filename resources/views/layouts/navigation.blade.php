@@ -10,11 +10,86 @@
                         :class="sidebarOpen ? 'fa-bars-staggered' : 'fa-bars'"></i>
                 </button>
 
+                @php
+                    $currentRouteName = Route::currentRouteName();
+                    $action = '';
+                    $parentRoute = null;
+
+                    // เช็กว่าหน้านี้มีการกำหนด title ไว้เองหรือไม่ (ถ้ามี มักจะเป็นหน้าหลักอยู่แล้ว)
+                    $mainTitle = request()->route('title');
+                    $isSubPage = false;
+
+                    if ($currentRouteName) {
+                        $parts = explode('.', $currentRouteName);
+                        $action = array_pop($parts); // ดึงคำสุดท้ายออกมา (เช่น create, edit, show)
+                        $baseRouteName = implode('.', $parts); // ได้ชื่อ Base Route (เช่น admin.advisor)
+
+                        // สร้างรายการชื่อ Route หน้าหลักที่เป็นไปได้ (ลองหา index ก่อน ถ้าไม่มีไปหา home)
+                        $possibleParents = [$baseRouteName . '.index', $baseRouteName . '.home', $baseRouteName];
+
+                        $parentRouteName = null;
+
+                        // วนลูปเช็กว่ามี Route ไหนที่มีอยู่จริงในระบบบ้าง
+                        foreach ($possibleParents as $route) {
+                            if (Route::has($route)) {
+                                $parentRouteName = $route;
+                                break; // ถ้าเจอแล้วให้หยุดหาทันที
+                            }
+                        }
+
+                        // ถ้าไม่มี Title ในตัวเอง (แปลว่าเป็นหน้าย่อย) ให้ไปดึง Title จากหน้าหลักที่หาเจอ
+                        if (!$mainTitle && $parentRouteName) {
+                            $parentRouteObj = Route::getRoutes()->getByName($parentRouteName);
+                            if ($parentRouteObj && isset($parentRouteObj->defaults['title'])) {
+                                $mainTitle = $parentRouteObj->defaults['title'];
+                            }
+                            $parentRoute = $parentRouteName;
+                            $isSubPage = true;
+                        }
+                    }
+
+                    $mainTitle = $mainTitle ?? 'จัดการข้อมูล';
+
+                    // แปลงชื่อ Action ภาษาอังกฤษ เป็นภาษาไทย สำหรับหน้าย่อย
+                    $actionMap = [
+                        'create' => 'เพิ่มข้อมูล',
+                        'edit' => 'แก้ไขข้อมูล',
+                        'show' => 'รายละเอียด',
+                        'view' => 'ดูข้อมูล',
+                        'score' => 'การให้คะแนน',
+                        'schedule' => 'จัดการตารางสอบ',
+                        'member' => 'ข้อมูลสมาชิก',
+                        'history' => 'ประวัติ',
+                        'add' => 'เพิ่มหัวข้อ',
+                        'editTopic' => 'แก้ไขหัวข้อ',
+                        'preview' => 'พรีวิวไฟล์',
+                        'group' => 'ข้อมูลกลุ่ม',
+                        'approveView' => 'รายละเอียดการอนุมัติ',
+                    ];
+
+                    $subTitle = $actionMap[$action] ?? ucfirst($action);
+                @endphp
+
                 <div
                     class="hidden sm:flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-2 border-l border-gray-200 dark:border-gray-700 pl-4">
-                    <span class="font-medium text-gray-800 dark:text-gray-200">
-                        {{ request()->route('title') ?? 'จัดการข้อมูล' }}
-                    </span>
+
+                    @if ($isSubPage && Route::has($parentRoute))
+                        <a href="{{ route($parentRoute) }}"
+                            class="hover:text-orange-500 dark:hover:text-orange-400 transition-colors">
+                            {{ $mainTitle }}
+                        </a>
+
+                        <i class="fa-solid fa-chevron-right text-[10px] text-gray-400 dark:text-gray-600"></i>
+
+                        <span class="font-medium text-orange-600 dark:text-orange-400">
+                            {{ $subTitle }}
+                        </span>
+                    @else
+                        <span class="font-medium text-gray-800 dark:text-gray-200">
+                            {{ $mainTitle }}
+                        </span>
+                    @endif
+
                 </div>
             </div>
 

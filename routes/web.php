@@ -188,7 +188,7 @@ Route::middleware(['auth:advisors', AdvisorIsAdmin::class])->group(function () {
 Route::middleware(['auth:students'])->group(function () {
 
     Route::prefix('student/group')->name('student.group.')->group(function () {
-        Route::get('index', [StudentController::class, 'groupIndex'])->name('index');
+        Route::get('index', [StudentController::class, 'groupIndex'])->name('index')->defaults('title', 'จัดการข้อมูลกลุ่มโครงงาน');
         Route::get('create', [StudentController::class, 'groupCreate'])->name('create');
         Route::post('store', [StudentController::class, 'groupStore'])->name('store');
         Route::get('edit/{group}', [StudentController::class, 'edit'])->name('edit');
@@ -196,7 +196,7 @@ Route::middleware(['auth:students'])->group(function () {
     });
 
     Route::prefix('student/propose')->name('student.propose.')->group(function () {
-        Route::get('index', [StudentController::class, 'proposeIndex'])->name('index');
+        Route::get('index', [StudentController::class, 'proposeIndex'])->name('index')->defaults('title', 'จัดการข้อมูลเสนอโครงงาน');
         Route::get('create', [StudentController::class, 'proposeCreate'])->name('create');
         Route::post('store', [StudentController::class, 'proposeStore'])->name('store');
         Route::get('edit/{id}', [StudentController::class, 'proposeEdit'])->name('edit');
@@ -206,7 +206,7 @@ Route::middleware(['auth:students'])->group(function () {
     });
 
     Route::prefix('student/submission')->name('student.submission.')->group(function () {
-        Route::get('index', [StudentController::class, 'submissionIndex'])->name('index');
+        Route::get('index', [StudentController::class, 'submissionIndex'])->name('index')->defaults('title', 'จัดการข้อมูลยื่นสอบโครงงาน');
         Route::get('create/{proposeId}', [StudentController::class, 'submissionCreate'])->name('create');
         Route::post('store/{proposeId}', [StudentController::class, 'submissionStore'])->name('store');
         // Route::get('submission/{id}/{propose_id}', [StudentController::class, 'submission'])->name('submission');
@@ -221,7 +221,7 @@ Route::middleware(['auth:students'])->group(function () {
     });
 
     Route::prefix('student/revision')->name('student.revision.')->group(function () {
-        Route::get('index', [StudentController::class, 'revisionIndex'])->name('index');
+        Route::get('index', [StudentController::class, 'revisionIndex'])->name('index')->defaults('title', 'จัดการข้อมูลแก้ไขโครงงาน');
         Route::get('create/{id}', [StudentController::class, 'revisionCreate'])->name('create');
         Route::post('store/{submission}', [StudentController::class, 'revisionStore'])->name('store');
         Route::get('edit/{revision}',   [StudentController::class, 'editRevision'])->name('edit');
@@ -231,7 +231,7 @@ Route::middleware(['auth:students'])->group(function () {
     });
 
     Route::prefix('student/upload')->name('student.upload.')->group(function () {
-        Route::get('index', [StudentController::class, 'uploadIndex'])->name('index');
+        Route::get('index', [StudentController::class, 'uploadIndex'])->name('index')->defaults('title', 'จัดการข้อมูลอัปโหลด');
         Route::get('create/{proposeId}', [StudentController::class, 'uploadCreate'])->name('create');
         Route::post('store/{proposeId}', [StudentController::class, 'uploadStore'])->name('store');
         Route::get('show/{upload}', [StudentController::class, 'uploadShow'])->name('show');
@@ -287,16 +287,16 @@ Route::middleware([AdvisorIsAdmin::class . ':advisor,teacher', 'auth:advisors'])
         Route::get('create/{id}', [AdvisorController::class, 'schedule'])->name('create');
         Route::post('save/{id}', [AdvisorController::class, 'scheduleSave'])->name('save');
         Route::get('group/{id}', [AdvisorController::class, 'getInvigilators'])->name('byGroup');
-        Route::get('show/{id}', [AdvisorController::class, 'showSchedule'])->name('show');
+        Route::get('show/{id}', [AdvisorController::class, 'showSchedule'])->name('show')->defaults('title', 'ดูตารางสอบ');
         Route::get('edit/{id}', [AdvisorController::class, 'scheduleEdit'])->name('edit');
         Route::put('update/{id}', [AdvisorController::class, 'scheduleUpdate'])->name('update');
     });
 
     Route::prefix('advisor/score')->name('advisor.score.')->group(function () {
-        Route::get('index', [AdvisorController::class, 'scoreIndex'])->name('index');
-        Route::get('score/{id}', [AdvisorController::class, 'scoreForm'])->name('score');
+        // Route::get('index', [AdvisorController::class, 'scoreIndex'])->name('index');
+        Route::get('score/{id}', [AdvisorController::class, 'scoreForm'])->name('score')->defaults('title', 'การให้คะแนน');
         Route::post('save/{id}', [AdvisorController::class, 'saveScore'])->name('save');
-        Route::get('view/{submission}', [AdvisorController::class, 'gradeView'])->name('view');
+        Route::get('view/{submission}', [AdvisorController::class, 'gradeView'])->name('view')->defaults('title', 'ดูคะแนน');
 
         // Route::get('manage/{id}/{propose_id}', [AdvisorController::class, 'manage'])->name('manage');
         // Route::get('download/{id}', [AdvisorController::class, 'downloadFile'])->name('download');
@@ -305,7 +305,7 @@ Route::middleware([AdvisorIsAdmin::class . ':advisor,teacher', 'auth:advisors'])
     });
 
     Route::prefix('advisor/revision')->name('advisor.revision.')->group(function () {
-        Route::get('index', [AdvisorController::class, 'revisionIndex'])->name('index');
+        Route::get('index', [AdvisorController::class, 'revisionIndex'])->name('index')->defaults('title', 'จัดการข้อมูลแก้ไขโครงงาน');
         Route::get('approve/{revision}',   [AdvisorController::class, 'revisionApprove'])->name('approve');
         Route::put('update/{revision}', [AdvisorController::class, 'revisionUpdate'])->name('update');
         Route::get('download/{id}', [AdvisorController::class, 'revisionDownloadFile'])->name('download');
@@ -313,7 +313,7 @@ Route::middleware([AdvisorIsAdmin::class . ':advisor,teacher', 'auth:advisors'])
     });
 
     Route::prefix('advisor/upload')->name('advisor.upload.')->group(function () {
-        Route::get('index', [AdvisorController::class, 'uploadIndex'])->name('index');
+        Route::get('index', [AdvisorController::class, 'uploadIndex'])->name('index')->defaults('title', 'จัดการข้อมูลอัปโหลด');
         Route::get('approve/{uploadId}', [AdvisorController::class, 'uploadApprove'])->name('approve');
         Route::put('update/{uploadId}', [AdvisorController::class, 'uploadUpdate'])->name('update');
         // Route::get('edit/{id}', [AdvisorController::class, 'uploadEdit'])->name('edit');
@@ -338,7 +338,7 @@ Route::middleware([AdvisorIsAdmin::class . ':teacher', 'auth:advisors'])->group(
     });
 
     Route::prefix('teacher/invigilator')->name('teacher.invigilator.')->group(function () {
-        Route::get('home', [TeacherController::class, 'InvigilatorHome'])->name('home');
+        Route::get('home', [TeacherController::class, 'InvigilatorHome'])->name('home')->defaults('title', 'จัดการข้อมูลกรรมการผู้คุมสอบ');
         Route::get('group/{id}', [TeacherController::class, 'InvigilatorGroup'])->name('group');
         Route::get('create', [TeacherController::class, 'create'])->name('create');
         Route::post('store', [TeacherController::class, 'store'])->name('store');
@@ -349,7 +349,7 @@ Route::middleware([AdvisorIsAdmin::class . ':teacher', 'auth:advisors'])->group(
     });
 
     Route::prefix('teacher/propose')->name('teacher.propose.')->group(function () {
-        Route::get('index', [TeacherController::class, 'proposeIndex'])->name('index');
+        Route::get('index', [TeacherController::class, 'proposeIndex'])->name('index')->defaults('title', 'การติดตามข้อมูลโครงงาน');
         Route::get('show/{id}', [TeacherController::class, 'proposeShow'])->name('show');
     });
 });
@@ -358,7 +358,7 @@ Route::middleware([AdvisorIsAdmin::class . ':teacher', 'auth:advisors'])->group(
 Route::middleware(['auth:advisors'])->group(function () {
 
     Route::prefix('invigilator/examination')->name('invigilator.examination.')->group(function () {
-        Route::get('index', [InvigilatorController::class, 'examinationIndex'])->name('index');
+        Route::get('index', [InvigilatorController::class, 'examinationIndex'])->name('index')->defaults('title', 'จัดการข้อมูลการสอบ');
         Route::get('score/{id}', [InvigilatorController::class, 'scoreForm'])->name('score');
         Route::post('save/{id}', [InvigilatorController::class, 'saveScore'])->name('save');
         Route::get('view/{id}', [InvigilatorController::class, 'submissionView'])->name('view');
@@ -367,7 +367,7 @@ Route::middleware(['auth:advisors'])->group(function () {
     });
 
     Route::prefix('invigilator/revision')->name('invigilator.revision.')->group(function () {
-        Route::get('index', [InvigilatorController::class, 'revisionIndex'])->name('index');
+        Route::get('index', [InvigilatorController::class, 'revisionIndex'])->name('index')->defaults('title', 'การอนุมัติแก้ไขโครงงาน');
         Route::get('approve/{revision}',   [InvigilatorController::class, 'revisionApprove'])->name('approve');
         Route::put('update/{revision}', [InvigilatorController::class, 'revisionUpdate'])->name('update');
         Route::get('download/{id}', [InvigilatorController::class, 'revisionDownloadFile'])->name('download');
@@ -386,52 +386,6 @@ Route::prefix('project')->name('project.')->group(function () {
     //     ->name('preview');
     Route::get('{source}/{id}/preview/{type}', [ProjectController::class, 'preview'])
         ->name('preview');
-});
-
-// Route::get('project/index', [ProjectController::class, 'index'])->name('home');
-
-
-Route::get('/phpinfo', function () {
-    // ป้องกันให้เฉพาะตอนพัฒนาเท่านั้น
-    if (! app()->environment('local')) {
-        abort(404);
-    }
-    // แสดง phpinfo()
-    phpinfo();
-});
-
-Route::get('/memory-limit', function () {
-    // เฉพาะแวดล้อม local เท่านั้น
-    if (! app()->environment('local')) {
-        abort(404);
-    }
-    return 'memory_limit = ' . ini_get('memory_limit');
-});
-
-Route::get('/admin/delete-upload/{id}', function ($id) {
-
-    $upload = Upload::find($id);
-
-    if (!$upload) {
-        return "ไม่พบ upload id = {$id}";
-    }
-
-    // ลบไฟล์จริง
-    $path = storage_path("app/public/uploads/upload/{$id}");
-
-    if (file_exists($path)) {
-        \Illuminate\Support\Facades\File::deleteDirectory($path);
-    }
-
-    // ลบข้อมูลใน upload_file
-    UploadFile::where('upload_id', $id)->delete();
-
-    // ลบข้อมูล upload
-    $upload->delete();
-
-    return "ลบ upload id {$id} เรียบร้อยแล้ว";
-
-    // /admin/delete-upload/18  use this to delete upload with id 18 or others
 });
 
 require __DIR__ . '/auth.php';

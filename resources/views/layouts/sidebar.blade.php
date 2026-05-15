@@ -1,6 +1,7 @@
 <aside id="logo-sidebar"
-    class="fixed top-0 left-0 z-40 w-[260px] h-screen bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 transition-transform duration-300 flex flex-col font-sans"
-    :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" aria-label="Sidebar">
+    class="fixed top-0 left-0 z-40 w-[260px] h-screen bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col font-sans"
+    :class="[sidebarOpen ? 'translate-x-0' : '-translate-x-full', isReady ? 'transition-transform duration-300' : '']"
+    aria-label="Sidebar">
 
     <div class="flex items-center px-5 h-16 border-b border-gray-100 dark:border-gray-800 shrink-0">
         <a href="{{ route('welcome') }}" class="flex items-center gap-3">

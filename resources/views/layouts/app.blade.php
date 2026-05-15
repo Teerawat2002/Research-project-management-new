@@ -32,8 +32,10 @@
     class="font-sans text-gray-800 antialiased bg-gray-50 dark:bg-gray-900 dark:text-gray-200 transition-colors duration-200">
 
     <div x-data="{
-        sidebarOpen: window.innerWidth >= 640 ? localStorage.getItem('sidebarOpen') !== 'false' : false
-    }" x-init="$watch('sidebarOpen', value => { if (window.innerWidth >= 640) localStorage.setItem('sidebarOpen', value) })"
+        sidebarOpen: window.innerWidth >= 640 ? localStorage.getItem('sidebarOpen') !== 'false' : false,
+        isReady: false
+    }" x-init="setTimeout(() => isReady = true, 100);
+    $watch('sidebarOpen', value => { if (window.innerWidth >= 640) localStorage.setItem('sidebarOpen', value) })"
         @resize.window="if(window.innerWidth < 640) sidebarOpen = false" class="flex min-h-screen flex-col">
 
         <div x-show="sidebarOpen" x-transition.opacity @click="sidebarOpen = false"
@@ -42,7 +44,9 @@
 
         @include('layouts.sidebar')
 
-        <div :class="sidebarOpen ? 'sm:ml-[260px]' : 'ml-0'" class="flex-1 transition-all duration-300 ease-in-out">
+        <div :class="[sidebarOpen ? 'sm:ml-[260px]' : 'ml-0', isReady ? 'transition-all duration-300 ease-in-out' : '']"
+            class="flex-1">
+
             @include('layouts.navigation')
 
             @isset($header)
